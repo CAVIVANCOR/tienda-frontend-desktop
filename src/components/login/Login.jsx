@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from "react";
 import "./Login.css";
 import { googleLogout, useGoogleLogin } from "@react-oauth/google";

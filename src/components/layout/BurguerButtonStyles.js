@@ -1,6 +1,6 @@
-import styled from 'styled-components'
+import styled from "styled-components";
+
 const Burguer = styled.div`
-  /* nav-icon-5 */
 .nav-icon-5{
   width: 35px;
   height: 30px;
@@ -31,7 +31,7 @@ const Burguer = styled.div`
   bottom:0px;
   left: 0px;
 }
-.nav-icon-5:not(.open):hover span:nth-child(1){
+/* .nav-icon-5:not(.open):hover span:nth-child(1){
   transform: rotate(-3deg) scaleY(1.1);
 }
 .nav-icon-5:not(.open):hover span:nth-child(2){
@@ -39,7 +39,7 @@ const Burguer = styled.div`
 }
 .nav-icon-5:not(.open):hover span:nth-child(3){
   transform: rotate(-4deg) scaleY(1.1);
-}
+} */
 .nav-icon-5.open span:nth-child(1){
   transform: rotate(45deg);
   top: 13px;

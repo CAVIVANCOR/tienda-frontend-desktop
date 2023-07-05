@@ -1,0 +1,36 @@
+.footer {
+    margin: 0;
+    padding: 0;
+    background-color: var(--footer-header-color);
+    display: flex;
+    justify-content: space-between;
+    align-items:center;
+    height: 100%;
+    max-width: 100%;
+  }
+  
+  .footer img {
+    height: 50px;
+    width: auto;
+    border-radius: 30px;
+  }
+
+  .footer p {
+    margin-left: 5px;
+    font-size:x-small;
+    margin-right: 5px;
+  }
+
+  .footer a {
+    margin-left: 5px;
+    font-size:x-small;
+    margin-right: 5px;
+  }
+  
+  @media (max-width: 768px) {
+
+  }
+  
+  @media (max-width: 480px) {
+
+  }

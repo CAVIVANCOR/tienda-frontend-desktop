@@ -1,0 +1,21 @@
+.header {
+    background-color: var(--footer-header-color);
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+    height: 100%;
+    max-width: 100%;
+  }
+  
+  .header img {
+    height: 50px;
+    width: auto;
+  }
+  
+  @media (max-width: 768px) {
+
+  }
+  
+  @media (max-width: 480px) {
+
+  }
