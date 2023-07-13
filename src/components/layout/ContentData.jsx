@@ -1,10 +1,14 @@
-/* eslint-disable no-unused-vars */
-import React from 'react'
 
-function ContentData() {
+import React from 'react';
+import './ContentData.css';
+import SearchResultsList from './SearchResultsList';
+
+function ContentData ({results, currentPage, itemsPerPage}) {
   return (
-    <div>ContentData</div>
-  )
+    <div className='content-data'>
+      {results && results.length > 0 && <SearchResultsList results={results} currentPage={currentPage} itemsPerPage={itemsPerPage}/>}
+    </div>
+    )
 }
 
-export default ContentData
+export default ContentData;

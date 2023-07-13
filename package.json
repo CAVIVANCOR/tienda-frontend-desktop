@@ -13,6 +13,7 @@
     "@react-oauth/google": "^0.11.0",
     "@reduxjs/toolkit": "^1.9.5",
     "axios": "^1.4.0",
+    "gridjs": "^6.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.10.1",

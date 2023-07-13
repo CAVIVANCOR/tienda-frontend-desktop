@@ -9,7 +9,7 @@ import './MainContainer.css';
 const MainContainerLayout = () => {
   return (
     <main className="main-container-layout">
-      <header className="header">
+      <header className="header-container">
         <Header/>
       </header>
       <nav className="navbar">
@@ -18,7 +18,7 @@ const MainContainerLayout = () => {
       <section className="main-content">
         <Content />
       </section>
-      <footer className="footer">
+      <footer className="footer-container">
         <Footer/>
       </footer>
     </main>

@@ -8,6 +8,8 @@ import logoEmpresa from "../../icons/logoCuadrado.png";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess, loginFailure } from "../../redux/features/task/login";
+import { cargarDatosGlobales } from "../../redux/features/task/datosGlobales";
+
 const Login =()=> {
     const loginFailureMessage = useSelector((state) => state.login.error);
     const dispatch = useDispatch();
@@ -17,6 +19,15 @@ const Login =()=> {
     const [popupStyle, setPopupStyle] = useState("hide");
     const popup = (usuario, password) => {
         handleAcceder({usuario, password});
+    };
+    const obtenerDatosGlobales = async () => {
+        let response = await axios.post("http://localhost:3001/datosGlobales/search", {id:1});
+        if (response.data.length > 0) {
+            console.log("obtenerDatosGlobales response.data", response.data);
+            dispatch(cargarDatosGlobales(response.data[0]));
+        } else {
+            console.log("Error: Datos Globales esta Vacio");
+        }
     };
     const [ user, setUser ] = useState(null);
     const [ profile, setProfile ] = useState(null);
@@ -29,6 +40,7 @@ const Login =()=> {
             if (usuario && password) {
                 let response = await axios.post("http://localhost:3001/usuarios/search", {usuario, password});
                 if (response.data.length > 0) {
+                    await obtenerDatosGlobales();
                     const {usuario,password}=response.data[0];
                     if (usuario && password) {
                         usuarioInputRef.current.value = usuario;
