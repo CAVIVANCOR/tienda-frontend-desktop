@@ -2,48 +2,61 @@
 import React, { useEffect, useState } from 'react';
 import "./SearchResult.css";
 import { Link } from 'react-router-dom';
+import axios from "axios";
+import { useSelector } from 'react-redux';
 
 function SearchResult (props) {
-  console.log(props);
+  const usuarioLogueado = useSelector((state) => state.login.user);
   const [showFotoModal, setShowFotoModal] = useState(false);
   const [showDescuentosModal, setShowDescuentosModal] = useState(false);
   const [showStockModal, setShowStockModal] = useState(false);
   const [stockAlmacenes, setStockAlmacenes] = useState([]);
+  useEffect(() => {
+    console.log("XXXXXXXXXXXXXXXXXXXX Data Obtener Stock por Almacen",{ProductoId: +props.dataCompleta.id, idAlmacen: +usuarioLogueado.AlmacenId})
+    obtenerStockAlmacenes({ProductoId: +props.dataCompleta.id, idAlmacen: +usuarioLogueado.AlmacenId});
+  },[props, usuarioLogueado]);
   const openFotoModal = () => {
     setShowFotoModal(true);
   };
-  
   const closeFotoModal = () => {
     setShowFotoModal(false);
   };
-  
   const openDescuentosModal = () => {
     setShowDescuentosModal(true);
   };
-  
   const closeDescuentosModal = () => {
     setShowDescuentosModal(false);
   };
-  
   const openStockModal = () => {
     setShowStockModal(true);
   };
-  
   const closeStockModal = () => {
     setShowStockModal(false);
   };
+  const obtenerStockAlmacenes = async (objConsultaStocks) => {
+      let response = await axios.post("http://localhost:3001/kardexAlmacen/consultaStocks", objConsultaStocks);
+      if (response.data.length > 0) {
+        let arrayStockAlmacenes = response.data;
+        let totalStock = arrayStockAlmacenes.reduce((a, b) => a + b.stock, 0)
+        arrayStockAlmacenes.push({descripcion:"STOCK GLOBAL",almacen:+999,stock: +totalStock})
+        await setStockAlmacenes(arrayStockAlmacenes)
+      } else {
+        let arrayStockAlmacenes = response.data;
+        let totalStock = 0
+        arrayStockAlmacenes.push({descripcion:"STOCK GLOBAL",almacen:+999,stock: +totalStock})
+        await setStockAlmacenes(arrayStockAlmacenes);
+        console.log("Error: No se encontro informacion de Stock");
+      }
+  };
+
   useEffect(() => {
     if (showStockModal) {
-      let arrayStockAlmacenes = [{almacen:"Almacen Central",stock:5}, {almacen:"Tienda Mesa Redonda",stock:3}, {almacen:"Tienda Santa Rosa de Quives",stock:2}, {almacen:"Tienda Ovalo Santa Anita",stock:1}];
-      let totalStock = arrayStockAlmacenes.reduce((a, b) => a + b.stock, 0)
-      console.log("totalStock",totalStock)
-      arrayStockAlmacenes.push({almacen:"STOCK GLOBAL",stock:totalStock})
-      console.log("arrayStockAlmacenes",arrayStockAlmacenes)
-      setStockAlmacenes(arrayStockAlmacenes)
-    } else {
-      setStockAlmacenes([])
-    }
+      console.log("Entro al clic del div stock",{ProductoId: +props.dataCompleta.id})
+      obtenerStockAlmacenes({ProductoId: +props.dataCompleta.id});
+      console.log(stockAlmacenes);
+    } 
   }, [showStockModal]);
+
 
   return (
     <div className='card-main'>
@@ -61,10 +74,12 @@ function SearchResult (props) {
                 <h2>P.V.Unit.:</h2>
                 <h3>{props.dataCompleta.valorVentaUnitMN}</h3>
               </div>
-              <div className='product-stock' onClick={openStockModal}>
-                <h2>Stock:</h2>
-                <h3>5</h3>
-              </div>
+                {stockAlmacenes.length>0 && (
+                  <div className='product-stock' onClick={openStockModal}>
+                    <h2>{stockAlmacenes[0].descripcion}</h2>
+                    <h3>{stockAlmacenes[0].stock}</h3>
+                  </div>
+                )}
             </div>
           </div>
         </div>
@@ -229,7 +244,7 @@ function SearchResult (props) {
                   {stockAlmacenes.map((alm, id) => {
                     return (
                       <div key={id} className='almacen-producto'>
-                        <h4>{alm.almacen}</h4>
+                        <h4>{alm.descripcion}</h4>
                         <h2>{alm.stock}</h2>
                       </div>
                     )})}

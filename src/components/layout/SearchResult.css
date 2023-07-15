@@ -22,8 +22,7 @@ align-items: center;
   border: 2px solid var(--footer-header-color);
 }
 .card-main .card-container:hover {
-  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.4);
-  transform: translateY(-15%);
+  border-radius: 50px 50px 50px 50px;
 }
 figure {
   background-color:var(--text-color);
@@ -412,9 +411,7 @@ figure img{
   transition: transform 0.3s ease-in-out;
   margin-bottom: 2px;
 }
-.card-main .ventana-modal-precios .ventana-modal-content .ventana-modal-content-info img:hover {
-  transform: scale(1.8);
-}
+
 @supports(object-fit: cover){
   .card-main .ventana-modal-precios .ventana-modal-content .ventana-modal-content-info img {
     object-fit: cover;
@@ -623,14 +620,12 @@ figure img{
   padding-bottom: 2px;
 }
 .card-main .ventana-modal-stocks .ventana-modal-content .ventana-modal-content-info img {
-  width: 80%;
+  width:50%;
   height: auto;
   transition: transform 0.3s ease-in-out;
   margin-bottom: 2px;
 }
-.card-main .ventana-modal-stocks .ventana-modal-content .ventana-modal-content-info img:hover {
-  transform: scale(1.8);
-}
+
 @supports(object-fit: cover){
   .card-main .ventana-modal-stocks .ventana-modal-content .ventana-modal-content-info img {
     object-fit: cover;

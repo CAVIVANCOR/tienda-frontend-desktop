@@ -9,13 +9,15 @@ import './Content.css';
 function Content() {
   const [results, setResults] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [stockMayorCero, setStockMayorCero] = useState(true);
+
   const itemsPerPage = 8;
   const totalPages = Math.ceil(results.length / itemsPerPage);
 
   return (
     <main className="content">
       <section className="content-controllers">
-        <ContentControllers setResults={setResults} results={results} />
+        <ContentControllers setResults={setResults} stockMayorCero={stockMayorCero} setStockMayorCero={setStockMayorCero}/>
       </section>
       <section className="content-data" >
         <ContentData results={results} currentPage={currentPage} itemsPerPage={itemsPerPage}/>
