@@ -5,23 +5,22 @@ import SearchBar from './SearchBar';
 import imagenLimpieza from '../../icons/limpieza.png';
 import imagenReload from '../../icons/reload.png';
 import axios from "axios";
-import ToggleSwitch from './ToggleSwitch';
-import { useSelector } from 'react-redux';
 
-function ContentControllers({setResults, stockMayorCero, setStockMayorCero}) {
-  const usuarioLogueado = useSelector((state) => state.login.user);
-  const [input, setInput] = useState("");
+function ContentControllers({setResults, input, codigoBarras, setInput, setCodigoBarras}) {
+
+
   useEffect(() => {
-    buscarProducto(input);
+    if (input!=="") buscarProducto({descripcion:input});
   }, [input]);
 
+  useEffect(() => {
+    if (codigoBarras!=="") buscarProducto({codigoProveedor:codigoBarras});
+  }, [codigoBarras]);
   const buscarProducto = async (buscar) => {
-      console.log("buscarProducto: buscar", buscar.toUpperCase());
       try {
           if (buscar!=="") {
-              let response = await axios.post("http://localhost:3001/productos/search", {descripcion:buscar});
+              let response = await axios.post("http://localhost:3001/productos/search", buscar);
               if (response.data.length > 0) {
-
                 setResults(response.data);
               } else {
                   console.log("Error: No se encontro ningun registro");
@@ -37,24 +36,36 @@ function ContentControllers({setResults, stockMayorCero, setStockMayorCero}) {
   const handleReloadClick = () => {
     if (input!==""){
       setResults([]);
-      setInput(input+" ");
+      if (input!==""){
+        setInput(input+" ");
+      }
+      if (codigoBarras!==""){
+        setInput(codigoBarras+" ");
+      }
     }
   };
 
   const handleCleanClick = () => {
     setResults([]);
     setInput("");
+    setCodigoBarras("");
   };
   return (
     <div className="search-bar">
-      <ToggleSwitch label="Stock>0" stockMayorCero={stockMayorCero} setStockMayorCero={setStockMayorCero} />
-      <SearchBar input={input} setInput={setInput}/>
-      <button onClick={handleReloadClick}>
-        <img src={imagenReload} alt="Reload Barra Search" />
-      </button>
-      <button onClick={handleCleanClick}>
-        <img src={imagenLimpieza} alt="Limpiar Barra Search" />
-      </button>
+      <SearchBar placeholder="Codigo Barras" input={codigoBarras} setInput={setCodigoBarras}/>
+      <SearchBar placeholder="Descripción" input={input} setInput={setInput}/>
+      <div className='searchbar-buttons'>
+        <div>
+          <button onClick={handleReloadClick}>
+            <img src={imagenReload} alt="Reload Barra Search" />
+          </button>
+        </div>
+        <div>
+          <button onClick={handleCleanClick}>
+            <img src={imagenLimpieza} alt="Limpiar Barra Search" />
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

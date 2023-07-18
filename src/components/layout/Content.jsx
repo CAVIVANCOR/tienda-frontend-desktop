@@ -6,18 +6,14 @@ import ContentTotals from './ContentTotals';
 import './Content.css';
 
 
-function Content() {
-  const [results, setResults] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [stockMayorCero, setStockMayorCero] = useState(true);
+function Content({ results, setResults, currentPage, itemsPerPage, totalPages, setCurrentPage, input, codigoBarras, setInput, setCodigoBarras }) {
+  console.log("Hola entro a Content");
 
-  const itemsPerPage = 8;
-  const totalPages = Math.ceil(results.length / itemsPerPage);
 
   return (
     <main className="content">
       <section className="content-controllers">
-        <ContentControllers setResults={setResults} stockMayorCero={stockMayorCero} setStockMayorCero={setStockMayorCero}/>
+        <ContentControllers setResults={setResults} input={input} codigoBarras={codigoBarras} setInput={setInput} setCodigoBarras={setCodigoBarras}/>
       </section>
       <section className="content-data" >
         <ContentData results={results} currentPage={currentPage} itemsPerPage={itemsPerPage}/>

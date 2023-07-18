@@ -53,6 +53,7 @@ function Header() {
               <h2>{usuarioLogueado.Personal.email}</h2>
               <h2>{usuarioLogueado.Personal.telefonos}</h2>
               <h2>{usuarioLogueado.Personal.TipoDocIdentidad.iniciales}:{usuarioLogueado.Personal.nroDocIdentidad}</h2>
+              <h2>Almacen Asignado:{usuarioLogueado.AlmacenId} - {usuarioLogueado.Almacen.descripcion}</h2>
             </div>
             <div className='ventana-modal-content-btn'>
               <button onClick={handleCerrarVentanaModal}>Aceptar</button>

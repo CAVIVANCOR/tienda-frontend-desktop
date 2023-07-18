@@ -6,6 +6,13 @@ align-items: center;
 .header > *{
   flex: 1 100%;
 }
+.header .logo-container img{
+  border-radius: 15px;  
+  opacity: 0.8;
+  background-size: cover;
+  background-size: cover;
+  background-position: center center;
+}
 .header .h1-container {
 width: max-content;
 }

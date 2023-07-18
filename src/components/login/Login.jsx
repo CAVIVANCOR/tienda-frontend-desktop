@@ -111,7 +111,7 @@ const Login =()=> {
             }
         };
         getUserData();
-    }, [user, navigate]);
+    }, [user]);
     const handleCancelar = () => {
         setProfile(null);
         setUser(null)

@@ -3,12 +3,18 @@
     width: auto;
     margin: 0;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-content: center;
     align-items:center;
     gap: 5px;
   }
+.searchbar-buttons{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
+}
   .search-bar button {
     background: none;
     border: none;
@@ -19,3 +25,36 @@
   max-height: 48px;
   width: auto;
 }
+
+  /* Estilos para dispositivos móviles */
+  @media only screen and (max-width: 37em) {
+
+  }
+  /* Estilos para tabletas */
+  @media only screen and (min-width: 37em) and (max-width: 64em) {
+    .search-bar {
+      height: auto;
+      width: auto;
+      margin: 0;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-content: center;
+      align-items:center;
+      gap: 5px;
+    }
+  }
+  /* Estilos para escritorios */
+  @media only screen and (min-width: 64em) {
+    .search-bar {
+      height: auto;
+      width: auto;
+      margin: 0;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-content: center;
+      align-items:center;
+      gap: 5px;
+    }
+  }

@@ -2,31 +2,42 @@
 import React, { useState } from 'react'
 import BurguerButton from './BurguerButton'
 import {NavContainer,BgDiv} from './NavStyle';
+import { Link, useNavigate } from 'react-router-dom';
 
 
-export default function Navbar() {
+export default function Navbar({  setResults, setCurrentPage, setInput, setCodigoBarras }) {
   const [clicked, setClicked] = useState(false)
+  const navigate = useNavigate();
+
   const handleClick = () => {
-    //cuando esta true lo pasa a false y vice versa
     setClicked(!clicked)
   }
+  const handleCerrareIr =(ruta)=>{
+    console.log("handleCerrareIr")
+    navigate(ruta);
+    setResults([]);
+    setCurrentPage(1);
+    setInput("");
+    setCodigoBarras("");
+    if (clicked) setClicked(!clicked);
+  };
+
   return (
-    <>
       <NavContainer>
-        <h2>Navbar</h2>
         <div className={`links ${clicked ? 'active' : ''}`}>
-          <a onClick={handleClick} href="#h">Inicio</a>
-          <a onClick={handleClick} href="#h">Ventas</a>
-          <a onClick={handleClick} href="#h">Compras</a>
-          <a onClick={handleClick} href="#h">Almacen</a>
-          <a onClick={handleClick} href="#h">Caja</a>
-          <a onClick={handleClick} href="#h">Gerencial</a>
+          <Link to="/app" className="cursor" onClick={()=>handleCerrareIr("/app")}><h2><span>Inicio</span></h2></Link>
+          <Link to="/app" className="cursor" ><h2><span>Ventas</span></h2></Link>
+          <Link to="/app" className="cursor" ><h2><span>Compras</span></h2></Link>
+          <Link to="/app" className="cursor" ><h2><span>Ventas</span></h2></Link>
+          <Link to="/app" className="cursor" ><h2><span>Almacen</span></h2></Link>
+          <Link to="/app" className="cursor" ><h2><span>Caja</span></h2></Link>
+          <Link to="/app" className="cursor" ><h2><span>Gerencia</span></h2></Link>
         </div>
         <div className='burguer'>
           <BurguerButton clicked={clicked} handleClick={handleClick} />
         </div>
         <BgDiv className={`initial ${clicked ? ' active' : ''}`}></BgDiv>
       </NavContainer>
-    </>
   )
 }
+

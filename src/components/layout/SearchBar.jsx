@@ -3,7 +3,7 @@ import { FaSearch } from "react-icons/fa";
 
 import "./SearchBar.css";
 
-function SearchBar ({  input, setInput }) {
+function SearchBar ({  placeholder, input, setInput }) {
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -14,7 +14,7 @@ function SearchBar ({  input, setInput }) {
     <div className="input-wrapper">
       <FaSearch id="search-icon" />
       <input
-        placeholder="Buscar ID, Descripción"
+        placeholder={placeholder}
         value={input}
         onInput={handleChange}
       />

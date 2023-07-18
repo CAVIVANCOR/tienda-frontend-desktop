@@ -9,7 +9,7 @@ export function App () {
   <div className="App">
       <Routes>
         <Route path="/" element={<Login />} />
-        {isLoggedIn && (<Route path="/app" element={<MainContainer/>} />)}
+        {isLoggedIn && <Route path="/app" element={<MainContainer/>} />}
       </Routes>
   </div>
   );

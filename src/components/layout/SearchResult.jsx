@@ -12,7 +12,6 @@ function SearchResult (props) {
   const [showStockModal, setShowStockModal] = useState(false);
   const [stockAlmacenes, setStockAlmacenes] = useState([]);
   useEffect(() => {
-    console.log("XXXXXXXXXXXXXXXXXXXX Data Obtener Stock por Almacen",{ProductoId: +props.dataCompleta.id, idAlmacen: +usuarioLogueado.AlmacenId})
     obtenerStockAlmacenes({ProductoId: +props.dataCompleta.id, idAlmacen: +usuarioLogueado.AlmacenId});
   },[props, usuarioLogueado]);
   const openFotoModal = () => {
@@ -88,6 +87,9 @@ function SearchResult (props) {
         <div className="ventana-modal">
           <div className="ventana-modal-content">
             <div className='ventana-modal-content-info'>
+              <div className='id-producto'>
+                <h1>{props.dataCompleta.id}</h1>
+              </div>
               <div className="foto-producto">
                 <img src={props.urlFotoProducto} alt="Foto Producto"/>
               </div>
@@ -165,6 +167,9 @@ function SearchResult (props) {
         <div className="ventana-modal-precios">
           <div className="ventana-modal-content">
             <div className='ventana-modal-content-info'>
+                <div className='id-producto'>
+                  <h1>{props.dataCompleta.id}</h1>
+                </div>
                 <div className="foto-producto">
                   <img src={props.urlFotoProducto} alt="Foto Producto"/>
                 </div>
@@ -224,6 +229,9 @@ function SearchResult (props) {
         <div className="ventana-modal-stocks">
           <div className="ventana-modal-content">
           <div className='ventana-modal-content-info'>
+                <div className='id-producto'>
+                  <h1>{props.dataCompleta.id}</h1>
+                </div>
                 <div className="foto-producto">
                   <img src={props.urlFotoProducto} alt="Foto Producto"/>
                 </div>

@@ -4,42 +4,45 @@ export const NavContainer = styled.nav`
 h1{
   color: yellow;
 }
-h2{
-  font-size: 2rem;
-  color: white;
-  font-weight: 400;
-  span{
-    font-weight: bold;
-  }
-}
-
-h2:hover{
-  color:#31b3b3;
-}
-  
-padding: .4rem;
-background-color: #333;
-display:flex;
-align-items:center;
-justify-content: space-between;
-z-index: 9999;
 
 a{
   color: white;
   text-decoration: none;
   margin-right: 1rem;
+  padding: 4px;
 }
+
+  
+padding: .4rem;
+background-color: var(--preciostock-color);
+display:flex;
+align-items:center;
+justify-content: space-between;
+z-index: 9999;
+
+
 .cursor{
   padding: .4rem;
   cursor:pointer;
-  font-weight: bold;
-  font-weight: 400;
   color: white;
-  font-size: 2rem;
   align-items:center;
-
 }
-
+.cursor h2{
+  font-size: 1rem;
+  color: white;
+  font-weight: 400;
+  padding: 2px;
+  border-radius: 5px;
+  span{
+    font-weight: bold;
+  }
+}
+.cursor h2:hover{
+  color: var(--preciostock-color);
+  background-color:var(--border-color);
+  padding: 2px;
+  border-radius: 5px;
+}
 .links{
   position: absolute;
   top: -700px;
