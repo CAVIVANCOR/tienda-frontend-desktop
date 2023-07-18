@@ -1,13 +1,14 @@
 /* eslint-disable react/prop-types */
 import { FaSearch } from "react-icons/fa";
-
 import "./SearchBar.css";
+import { useDispatch } from "react-redux";
 
-function SearchBar ({  placeholder, input, setInput }) {
+function SearchBar ({ placeholder, input, setInput }) {
 
+  const dispatch = useDispatch();
   const handleChange = (e) => {
-    const value = e.target.value;
-    setInput(value);
+    let value = e.target.value;
+    dispatch(setInput(value));
   };
 
   return (

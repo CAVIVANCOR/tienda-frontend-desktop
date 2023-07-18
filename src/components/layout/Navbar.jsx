@@ -3,9 +3,10 @@ import React, { useState } from 'react'
 import BurguerButton from './BurguerButton'
 import {NavContainer,BgDiv} from './NavStyle';
 import { Link, useNavigate } from 'react-router-dom';
-
-
-export default function Navbar({  setResults, setCurrentPage, setInput, setCodigoBarras }) {
+import { useDispatch } from 'react-redux';
+import { inicializarInicio } from '../../redux/features/task/inicio';
+export default function Navbar() {
+  const dispatch = useDispatch();
   const [clicked, setClicked] = useState(false)
   const navigate = useNavigate();
 
@@ -15,10 +16,7 @@ export default function Navbar({  setResults, setCurrentPage, setInput, setCodig
   const handleCerrareIr =(ruta)=>{
     console.log("handleCerrareIr")
     navigate(ruta);
-    setResults([]);
-    setCurrentPage(1);
-    setInput("");
-    setCodigoBarras("");
+    dispatch(inicializarInicio());
     if (clicked) setClicked(!clicked);
   };
 

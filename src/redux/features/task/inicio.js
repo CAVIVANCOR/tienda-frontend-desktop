@@ -18,8 +18,13 @@ const inicioSlice = createSlice({
         state.inputCodigoBarras = action.payload;
     },
     setResults: (state, action) => {
-        state.inputCodigoBarras = action.payload;
+        state.results = action.payload;
+        state.currentPage = 1;
+        state.totalPages = Math.ceil(action.payload.length / state.itemsPerPage);
     },
+    setCurrentPage: (state, action) => {
+      state.currentPage = action.payload;
+  },
     inicializarInicio: (state) => {
       state.inputSearch = "";
       state.inputCodigoBarras = "";
@@ -31,6 +36,6 @@ const inicioSlice = createSlice({
   },
 });
 
-export const { setInputSearch, setInputCodigoBarras, setResults, inicializarInicio } = inicioSlice.actions;
+export const { setInputSearch, setInputCodigoBarras, setResults, inicializarInicio, setCurrentPage } = inicioSlice.actions;
 
 export default inicioSlice.reducer;

@@ -1,27 +1,30 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import './ContentControllers.css';
 import SearchBar from './SearchBar';
 import imagenLimpieza from '../../icons/limpieza.png';
 import imagenReload from '../../icons/reload.png';
 import axios from "axios";
-
-function ContentControllers({setResults, input, codigoBarras, setInput, setCodigoBarras}) {
-
+import { setInputSearch, setInputCodigoBarras, setResults, inicializarInicio } from '../../redux/features/task/inicio';
+import { useDispatch, useSelector } from 'react-redux';
+function ContentControllers() {
+  const inicioInputSearch = useSelector((state) => state.inicio.inputSearch);
+  const inicioInputCodigoBarras = useSelector((state) => state.inicio.inputCodigoBarras);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (inicioInputSearch!=="") buscarProducto({descripcion:inicioInputSearch});
+  }, [inicioInputSearch]);
 
   useEffect(() => {
-    if (input!=="") buscarProducto({descripcion:input});
-  }, [input]);
-
-  useEffect(() => {
-    if (codigoBarras!=="") buscarProducto({codigoProveedor:codigoBarras});
-  }, [codigoBarras]);
+    if (inicioInputCodigoBarras!=="") buscarProducto({codigoProveedor:inicioInputCodigoBarras});
+  }, [inicioInputCodigoBarras]);
   const buscarProducto = async (buscar) => {
       try {
           if (buscar!=="") {
+            console.log("*************Entro a BuscarProducto",buscar)
               let response = await axios.post("http://localhost:3001/productos/search", buscar);
               if (response.data.length > 0) {
-                setResults(response.data);
+                dispatch(setResults(response.data));
               } else {
                   console.log("Error: No se encontro ningun registro");
               }
@@ -34,26 +37,25 @@ function ContentControllers({setResults, input, codigoBarras, setInput, setCodig
       }
   };
   const handleReloadClick = () => {
-    if (input!==""){
-      setResults([]);
-      if (input!==""){
-        setInput(input+" ");
+    if (inicioInputSearch!==""){
+      dispatch(setResults([]));
+      if (inicioInputSearch!==""){
+        setInputSearch(inicioInputSearch+" ");
       }
-      if (codigoBarras!==""){
-        setInput(codigoBarras+" ");
-      }
+    }
+    if (inicioInputCodigoBarras!==""){
+      dispatch(setResults([]));
+      setInputCodigoBarras(inicioInputCodigoBarras+" ");
     }
   };
 
   const handleCleanClick = () => {
-    setResults([]);
-    setInput("");
-    setCodigoBarras("");
+    dispatch(inicializarInicio());
   };
   return (
     <div className="search-bar">
-      <SearchBar placeholder="Codigo Barras" input={codigoBarras} setInput={setCodigoBarras}/>
-      <SearchBar placeholder="Descripción" input={input} setInput={setInput}/>
+      <SearchBar placeholder="Codigo Barras" input={inicioInputCodigoBarras} setInput={setInputCodigoBarras}/>
+      <SearchBar placeholder="Descripción" input={inicioInputSearch} setInput={setInputSearch}/>
       <div className='searchbar-buttons'>
         <div>
           <button onClick={handleReloadClick}>

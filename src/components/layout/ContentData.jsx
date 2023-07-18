@@ -2,11 +2,12 @@
 import React from 'react';
 import './ContentData.css';
 import SearchResultsList from './SearchResultsList';
-
-function ContentData ({results, currentPage, itemsPerPage}) {
+import { useSelector } from 'react-redux';
+function ContentData () {
+  const results = useSelector((state) => state.inicio.results);
   return (
     <div className='content-data'>
-      {results && results.length > 0 && <SearchResultsList results={results} currentPage={currentPage} itemsPerPage={itemsPerPage}/>}
+      {results && results.length > 0 && <SearchResultsList />}
     </div>
     )
 }

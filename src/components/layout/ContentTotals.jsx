@@ -5,21 +5,26 @@ import imagenPrimeraPagina from '../../icons/primera-pagina.png';
 import imagenUltimaPagina from '../../icons/ultima-pagina.png';
 import imagenSiguientePagina from '../../icons/siguiente-pagina.png';
 import imagenPreviaPagina from '../../icons/previa-pagina.png';
-function ContentTotals({currentPage, totalPages, setCurrentPage}) {
-  
+import { useSelector, useDispatch } from 'react-redux';
+import { setCurrentPage } from '../../redux/features/task/inicio';
+function ContentTotals() {
+  const dispatch = useDispatch();
+  const currentPage = useSelector((state) => state.inicio.currentPage);
+  const totalPages = useSelector((state) => state.inicio.totalPages);
+
   const handlePreviousPage = () => {
-    setCurrentPage(prevPage => prevPage > 1 ? prevPage - 1 : prevPage);
+    dispatch(setCurrentPage(prevPage => prevPage > 1 ? prevPage - 1 : prevPage));
   };
 
   const handleNextPage = () => {
-    setCurrentPage(prevPage => prevPage < totalPages ? prevPage + 1 : prevPage);
+    dispatch(setCurrentPage(prevPage => prevPage < totalPages ? prevPage + 1 : prevPage));
   };
   const handleFirstPage = () => {
-    setCurrentPage(1);
+    dispatch(setCurrentPage(1));
   };
 
   const handleLastPage = () => {
-    setCurrentPage(totalPages);
+    dispatch(setCurrentPage(totalPages));
   };
   return (
     <div className="content-pagination">
