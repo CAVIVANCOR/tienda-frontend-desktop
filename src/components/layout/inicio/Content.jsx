@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
+import React from 'react';
 import ContentControllers from './ContentControllers';
 import ContentData from './ContentData';
 import ContentTotals from './ContentTotals';
@@ -17,7 +17,7 @@ function Content() {
         <ContentData />
       </section>
       <section className="content-totals">
-      <ContentTotals />
+        <ContentTotals />
       </section>
     </main>
   )

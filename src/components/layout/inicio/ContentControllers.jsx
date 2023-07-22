@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect } from 'react'
 import './ContentControllers.css';
-import SearchBar from './SearchBar';
-import imagenLimpieza from '../../icons/limpieza.png';
-import imagenReload from '../../icons/reload.png';
+import SearchBar from '../../layout/global/SearchBar';
+import imagenLimpieza from '../../../icons/limpieza.png';
+import imagenReload from '../../../icons/reload.png';
 import axios from "axios";
-import { setInputSearch, setInputCodigoBarras, setResults, inicializarInicio } from '../../redux/features/task/inicio';
+import { setInputSearch, setInputCodigoBarras, setResults, inicializarInicio } from '../../../redux/features/task/inicio';
 import { useDispatch, useSelector } from 'react-redux';
 function ContentControllers() {
   const inicioInputSearch = useSelector((state) => state.inicio.inputSearch);
@@ -54,8 +54,8 @@ function ContentControllers() {
   };
   return (
     <div className="search-bar">
-      <SearchBar placeholder="Codigo Barras" input={inicioInputCodigoBarras} setInput={setInputCodigoBarras}/>
-      <SearchBar placeholder="Descripción" input={inicioInputSearch} setInput={setInputSearch}/>
+      <SearchBar placeholder="Codigo Barras" setInput={setInputCodigoBarras}/>
+      <SearchBar placeholder="Descripción" setInput={setInputSearch}/>
       <div className='searchbar-buttons'>
         <div>
           <button onClick={handleReloadClick}>

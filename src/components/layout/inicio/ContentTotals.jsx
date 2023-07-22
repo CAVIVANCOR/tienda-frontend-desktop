@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import './ContentTotals.css';
-import imagenPrimeraPagina from '../../icons/primera-pagina.png';
-import imagenUltimaPagina from '../../icons/ultima-pagina.png';
-import imagenSiguientePagina from '../../icons/siguiente-pagina.png';
-import imagenPreviaPagina from '../../icons/previa-pagina.png';
+import imagenPrimeraPagina from '../../../icons/primera-pagina.png';
+import imagenUltimaPagina from '../../../icons/ultima-pagina.png';
+import imagenSiguientePagina from '../../../icons/siguiente-pagina.png';
+import imagenPreviaPagina from '../../../icons/previa-pagina.png';
 import { useSelector, useDispatch } from 'react-redux';
-import { setCurrentPage } from '../../redux/features/task/inicio';
+import { setCurrentPage } from '../../../redux/features/task/inicio';
 function ContentTotals() {
   const dispatch = useDispatch();
   const currentPage = useSelector((state) => state.inicio.currentPage);

@@ -46,7 +46,7 @@ const Login =()=> {
                         usuarioInputRef.current.value = usuario;
                         passwordInputRef.current.value = password;
                         dispatch(loginSuccess(response.data[0])); // Almacena response.data[0] en el estado global
-                        navigate("/app");
+                        navigate("/inicio");
                     }
                 } else {
                     console.log("Error: Usuario o contraseña incorrectos");
@@ -88,7 +88,7 @@ const Login =()=> {
                                 usuarioInputRef.current.value = usuario;
                                 passwordInputRef.current.value = password;
                                 dispatch(loginSuccess(response.data[0])); // Almacena response.data[0] en el estado global
-                                navigate("/app");
+                                navigate("/inicio");
                             } else {
                                 console.log("Error: Usuario o contraseña incorrectos");
                                 dispatch(loginFailure("Error: Usuario o contraseña incorrectos")); // Disparar la acción loginFailure con el mensaje de error
@@ -146,7 +146,7 @@ const Login =()=> {
                     usuarioInputRef.current.value = usuarioCreado.usuario;
                     passwordInputRef.current.value = usuarioCreado.password;
                     dispatch(loginSuccess(usuarioCreado)); // Almacena usuarioCreado en el estado global
-                    navigate("/app");
+                    navigate("/inicio");
                 } else {
                     console.log("Error: No se pudo crear en la Tabla Usuario");
                     dispatch(loginFailure("Error: No se pudo crear en la Tabla Usuario")); // Disparar la acción loginFailure con el mensaje de error

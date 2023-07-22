@@ -10,7 +10,7 @@
     align-items: center;
   }
   
-  .input-wrapper  input {
+  .input-wrapper input {
     background-color: transparent;
     border: none;
     height: 100%;
@@ -18,7 +18,7 @@
     width: 100%;
     margin-left: 5px;
   }
-  
+
   .input-wrapper input:focus {
     outline: none;
   }

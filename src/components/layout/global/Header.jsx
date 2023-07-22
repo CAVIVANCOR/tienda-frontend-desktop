@@ -1,8 +1,9 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import './Header.css';
-import imagenlogoOut from '../../icons/logoutOut.png';
+import imagenlogoOut from '../../../icons/logoutOut.png';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from "../../redux/features/task/login";
+import { logout } from "../../../redux/features/task/login";
 import { useNavigate } from 'react-router-dom';
 
 function Header() {

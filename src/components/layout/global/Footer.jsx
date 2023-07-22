@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import './Footer.css';
-import imagenLogo13 from '../../icons/logoCuadrado.png';
-import logoWhatsApp from '../../icons/logoWhatsApp.png';
+import imagenLogo13 from '../../../icons/logoCuadrado.png';
+import logoWhatsApp from '../../../icons/logoWhatsApp.png';
 
 function Footer() {
   return (

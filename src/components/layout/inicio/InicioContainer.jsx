@@ -1,12 +1,11 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react";
-import Header from "./Header";
-import Footer from "./Footer";
+import React from "react";
+import Header from "../global/Header";
+import Footer from "../global/Footer";
 import Content from "./Content";
-import NavBar from "./Navbar";
-import './MainContainer.css';
-
-const MainContainer = () => {
+import NavBar from "../global/Navbar";
+import './InicioContainer.css';
+const InicioContainer = () => {
   console.log("Hola entro a MainContainer");
   return (
     <main className="main-container-layout">
@@ -26,4 +25,4 @@ const MainContainer = () => {
   );
 };
 
-export default MainContainer;
+export default InicioContainer;
