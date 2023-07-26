@@ -7,7 +7,6 @@
   height:max-content;
   width:max-content;
 }
-
 .content-controllers {
   width:max-content;
   color:var(--text-color);
@@ -17,7 +16,6 @@
   border-radius: 5px;
   margin:auto;
 }
-
 .content-data {
   height: 500px;
   width:1000px;
@@ -27,7 +25,6 @@
   border-radius: 5px;
   margin:auto;
 }
-
 .content-totals {
   height: auto;
   width:1000px;

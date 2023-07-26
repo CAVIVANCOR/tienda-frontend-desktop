@@ -3,7 +3,7 @@ import React from 'react';
 import ContentControllers from './ContentControllers';
 import './Content.css';
 import { useSelector } from 'react-redux';
-import DataTableGrid from '../Table/DataTableGrid';
+import ListaVentasTableGrid from './ListaVentasTableGrid';
 function Content() {
   const results = useSelector((state) => state.inicio.results);
 
@@ -14,7 +14,7 @@ function Content() {
         <ContentControllers />
       </section>
       <section className="content-data" >
-        {results && results.length > 0 && <DataTableGrid />}
+        {results && results.length > 0 && <ListaVentasTableGrid />}
       </section>
     </main>
   )

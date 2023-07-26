@@ -55,11 +55,6 @@ function ContentControllers() {
       <SearchBar placeholder="Razon Social" setInput={setInputSearch}/>
       <div className='searchbar-buttons'>
         <div>
-          <button onClick={handleReloadClick}>
-            <img src={imagenReload} alt="Reload Barra Search" />
-          </button>
-        </div>
-        <div>
           <button onClick={handleCleanClick}>
             <img src={imagenLimpieza} alt="Limpiar Barra Search" />
           </button>

@@ -4,21 +4,19 @@ import { useSelector } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
 import { IconButton } from '@mui/material';
 import { Edit, Delete, Visibility } from '@mui/icons-material';
-import './DataTableGrid.css';
+import './ListaVentasTableGrid.css';
 import FichaVentasModal from './FichaVentasModal';
 
-function DataTableGrid() {
+function ListaVentasTableGrid() {
     const results = useSelector((state) => state.inicio.results);
     const [tableData, setTableData] = useState([]);
     const [tableColumns, setTableColumns] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedRow, setSelectedRow] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
-
     useEffect(() => {
         prepararData();
     }, [results]);
-
     const prepararData = async() => {
         console.log("Entro useEffect", results);
         let dataPreparada = results.map((venta) => {
@@ -80,20 +78,19 @@ function DataTableGrid() {
             headerName: 'Actions',
             width: 150,
             renderCell: (params) => (
-              <>
-                <IconButton onClick={() => handleEdit(params.row)}>
-                    <Edit />
-                </IconButton>
-                <IconButton onClick={() => handleDelete(params.row)}>
-                  <Delete />
-                </IconButton>
-                <IconButton onClick={() => handleShow(params.row)}>
-                  <Visibility />
-                </IconButton>
-              </>
+                <>
+                    <IconButton onClick={() => handleEdit(params.row)}>
+                        <Edit />
+                    </IconButton>
+                    <IconButton onClick={() => handleDelete(params.row)}>
+                        <Delete />
+                    </IconButton>
+                    <IconButton onClick={() => handleShow(params.row)}>
+                        <Visibility />
+                    </IconButton>
+                </>
             ),
-          });
-
+        });
         setTableData(dataPreparada);
         setTableColumns(columns);
     };
@@ -102,24 +99,21 @@ function DataTableGrid() {
         setSelectedRow(row);
         console.log("row", row.id);
     };
-    
     const handleDelete = (row) => {
         console.log("row", row.id);
     };
-    
     const handleShow = (row) => {
         console.log("row", row.id);
     };
     const openEditModal = () => {
         setIsEditModalOpen(true);
     };
-    
     const closeEditModal = () => {
         setIsEditModalOpen(false);
     };
     const handleSelectionChange = (newSelection) => {
         setSelectedRows(newSelection);
-      };
+    };
     console.log("tableData:", tableData,"tableColumns:", tableColumns);
     return (
             <div className='container-datagrid'>
@@ -151,5 +145,4 @@ function DataTableGrid() {
             </div>
     )
 }
-export default DataTableGrid;
-
+export default ListaVentasTableGrid;
