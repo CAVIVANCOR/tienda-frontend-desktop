@@ -29,9 +29,9 @@ function ContentData() {
     console.log("row", row.cells[0].data);
   };
 
-  const updateData = () => {
+  const updateData = async () => {
     let total = 0;
-    const updatedDataVista = results.map((venta) => {
+    const updatedDataVista = await results.map((venta) => {
       total = venta.DetVentas.reduce((prev, curr) => prev + +curr.pvTotalMN, 0);
       return {
         ID: +venta.id,
@@ -43,9 +43,9 @@ function ContentData() {
       };
     });
 
-    setDataVista(updatedDataVista);
-    setDatos(updatedDataVista.map(objeto => Object.values(objeto)));
-    setPropiedades(Object.keys(updatedDataVista[0]));
+    await setDataVista(updatedDataVista);
+    await setDatos(updatedDataVista.map(objeto => Object.values(objeto)));
+    await setPropiedades(Object.keys(updatedDataVista[0]));
     let botonEditar = {
       name: "🔥",
       formatter: (cell, row) => {
@@ -53,6 +53,7 @@ function ContentData() {
       }
     };
     setPropiedades(prevPropiedades => [...prevPropiedades, botonEditar]);
+    console.log("Datos:", datos,"Propiedades:", propiedades);
   };
 
   return (

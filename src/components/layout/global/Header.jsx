@@ -5,6 +5,7 @@ import imagenlogoOut from '../../../icons/logoutOut.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from "../../../redux/features/task/login";
 import { useNavigate } from 'react-router-dom';
+import VerModalUsuarioLogueado from './verModalUsuarioLogueado';
 
 function Header() {
   const usuarioLogueado = useSelector((state) => state.login.user);
@@ -23,11 +24,12 @@ function Header() {
   const handleLogoutUsuario = ()=>{
     dispatch(logout()); 
     navigate("/");
-    console.log("handleLogoutUsuario")
+    //console.log("handleLogoutUsuario")
   };
-  console.log("datosEmpresa.urlLogoEmpresa",datosEmpresa)
+ console.log("datosEmpresa.urlLogoEmpresa",datosEmpresa.urlLogoEmpresa,"usuarioLogueado.Personal.urlFoto",usuarioLogueado.Personal.urlFoto );
   const imageLogoEmpresaUrl = `http://localhost:3001${datosEmpresa.urlLogoEmpresa}`;
-  console.log("imageLogoEmpresaUrl", imageLogoEmpresaUrl);
+  const imageUsuarioLogueadoUrl = `http://localhost:3001${usuarioLogueado.Personal.urlFoto}`;
+  //console.log("imageLogoEmpresaUrl", imageLogoEmpresaUrl);
   return (
     <div className='header'>
       <div className="logo-container">
@@ -38,30 +40,18 @@ function Header() {
       </div>
       <div className="usuario-container">
         <button className="inf-usuario-btn" onClick={() => handleInfUsuario()}>
-          <img className="foto-usuario" src={usuarioLogueado.Personal.urlFoto} alt="Foto Usuario"/>
+          <img className="foto-usuario" src={imageUsuarioLogueadoUrl} alt="Foto Usuario"/>
         </button>
         <button className="logout.usuario-btn" onClick={() => handleLogoutUsuario()}>
           <img className="foto-logout" src={imagenlogoOut} alt="LogoOut"/>
         </button>
       </div>
-      {mostrarVentanaModal && (
-        <div className="ventana-modal">
-          <div className="ventana-modal-content">
-            <div className='ventana-modal-content-info'>
-              <img className="foto-usuario" src={usuarioLogueado.Personal.urlFoto} alt="Foto Usuario"/>
-              <h2>{usuarioLogueado.Personal.nombres}</h2>
-              <h2>Rol:{usuarioLogueado.Rol.descripcion}</h2>
-              <h2>{usuarioLogueado.Personal.email}</h2>
-              <h2>{usuarioLogueado.Personal.telefonos}</h2>
-              <h2>{usuarioLogueado.Personal.TipoDocIdentidad.iniciales}:{usuarioLogueado.Personal.nroDocIdentidad}</h2>
-              <h2>Almacen Asignado:{usuarioLogueado.AlmacenId} - {usuarioLogueado.Almacen.descripcion}</h2>
-            </div>
-            <div className='ventana-modal-content-btn'>
-              <button onClick={handleCerrarVentanaModal}>Aceptar</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {mostrarVentanaModal && (<VerModalUsuarioLogueado 
+                                isOpen={mostrarVentanaModal}
+                                onClose={handleCerrarVentanaModal}
+                                usuarioLogueado={usuarioLogueado}
+                                imageUsuarioLogueadoUrl={imageUsuarioLogueadoUrl}
+                              />)}
     </div>
   )
 }

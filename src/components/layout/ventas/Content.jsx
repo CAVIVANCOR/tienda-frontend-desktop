@@ -1,12 +1,9 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import ContentControllers from './ContentControllers';
-import ContentData from './ContentData';
-import ContentTotals from './ContentTotals';
 import './Content.css';
 import { useSelector } from 'react-redux';
-
-
+import DataTableGrid from '../Table/DataTableGrid';
 function Content() {
   const results = useSelector((state) => state.inicio.results);
 
@@ -17,7 +14,7 @@ function Content() {
         <ContentControllers />
       </section>
       <section className="content-data" >
-        {results && results.length > 0 && <ContentData />}
+        {results && results.length > 0 && <DataTableGrid />}
       </section>
     </main>
   )

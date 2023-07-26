@@ -20,7 +20,13 @@ function ContentControllers() {
             console.log("Entro a BuscarVentas",buscar)
               response = await axios.post("http://localhost:3001/cabVentas/search", buscar);
               if (response.data.length > 0) {
-                dispatch(setResults(response.data));
+                const resultsWithDate = response.data.map(item => {
+                  return {
+                    ...item,
+                    fecha: new Date(item.fecha).toISOString() // Aquí se asume que el campo fecha es una cadena de texto con el formato adecuado para crear un objeto Date
+                  }
+                });
+                dispatch(setResults(resultsWithDate));
               } else {
                   console.log("Error: No se encontro ningun registro");
               }
