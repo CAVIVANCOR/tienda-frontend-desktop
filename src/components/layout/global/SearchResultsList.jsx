@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import "./SearchResultsList.css";
 import SearchResult from "./SearchResult";
@@ -25,5 +26,4 @@ function SearchResultsList() {
     </section>
   );
 }
-
 export default SearchResultsList;

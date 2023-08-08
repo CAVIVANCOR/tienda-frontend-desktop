@@ -1,0 +1,57 @@
+.dialogDetVentas {
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 1100px; 
+    overflow: hidden;
+    margin: auto;
+}
+/* PaperProps={{ style: { maxWidth: '1000px', maxHeight: 'calc(100vh - 200px)', overflow: 'hidden' } }} */
+.dialogTitleDetVentas {
+    color:var(--body-color);
+    text-align: center;
+    max-width: 100%;
+}
+.dialogContentDetVentas {
+    max-width: 100%;
+    margin: auto;
+    top: auto;
+    padding: auto; 
+    text-align: center;
+    overflow:hidden;
+}
+/* style={{ maxHeight: 'calc(100vh - 300px)', overflow: 'hidden' }} */
+.cardDetVentas{
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow:hidden;
+}
+.cardMediaDetVentas{
+    max-width: 350px;
+    max-height: 250px;
+    border-radius: 10px;
+}
+.cardContentDetVentas{
+    width: 100%;
+    overflow:hidden;
+}
+
+@media (max-width: 768px) {
+    .dialogDetVentas {
+        max-width: 600px; 
+      }
+}
+@media (max-width: 480px) {
+    .dialogDetVentas {
+        max-width: 450px;
+        max-height: auto;
+      } 
+      .dialogContentDetVentas {
+        display: flex;
+        flex-direction: column; 
+    }
+}

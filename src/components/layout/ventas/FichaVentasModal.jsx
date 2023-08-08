@@ -1,171 +1,551 @@
+/* eslint-disable no-undef */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, Box } from '@mui/material';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, Select, MenuItem, IconButton } from '@mui/material';
 import './FichaVentasModal.css';
-function FichaVentasModal({ isOpen, onClose, selectedRow, setSelectedRow, setSelectedRows }) {
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs from 'dayjs';
+import moment from 'moment';
+import 'moment/locale/es'; // Importa el idioma si lo necesitas
+import axios from 'axios';
+import {formatDateStringToyyyymmdd} from '../../../utilities/utilities';
+import { NumericFormat } from 'react-number-format';
+import { DataGrid } from '@mui/x-data-grid';
+import { Delete, Edit, Visibility } from '@mui/icons-material';
+import FichaDetVentasModal from './FichaDetVentasModal';
+import { useDispatch, useSelector } from 'react-redux';
+import { setResults } from '../../../redux/features/task/inicio';
+function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, setFichaDataVentas }) {
   const results = useSelector((state) => state.inicio.results);
-  let objetoEncontrado = results.find(objeto => +objeto.id === +selectedRow.id);
-  const [formData, setFormData] = useState(objetoEncontrado);
-
-  const handleChange = (event) => {
-    setFormData({
-        ...formData,
-        [event.target.name]: event.target.value,
-    });
-  };
-  const handleSubmit = () => {
-    // Aquí puedes manejar la lógica de guardar los cambios y cerrar el modal
-    setSelectedRow(null);
-    setSelectedRows([]); // Deseleccionar el registro en el DataGrid
-    onClose();
-  };
-  const handleClose = () => {
-    setSelectedRow(null); // Deseleccionar el registro al cerrar el modal
-    setSelectedRows([]); // Deseleccionar el registro en el DataGrid
-    onClose();
-  };
-console.log("EditModal:", isOpen, onClose, selectedRow);
-let valorVentaTotal = 0;
-let descuentoTotal = 0;
-let porcentajeDescuentoTotal = 0;
-let valorVentaNetoTotal = 0;
-let igvTotal = 0;
-let precioVentaTotal = 0;
-const cellStyle = {
-  padding: '8px',
-  backgroundColor: '#d8c690', // Cambiar el color de fondo de las celdas aquí
-  border: '1px solid #e4e1e1', // Agregar un borde a las celdas
-  fontSize: '10px'
+  const datosGlobales = useSelector((state) => state.datosGlobales.data);
+  const dispatch = useDispatch();
+  const [detalleVentas, setDetalleVentas] = useState(fichaDataVentas.DetVentas);
+  const [detTableData, setDetTableData] = useState([]);
+  const [detTableColumns, setDetTableColumns] = useState([]);
+  const [totalesCabVentas, setTotalesCabVentas] = useState({
+    valorVentaTotal: 0,
+    descuentoTotal: 0,
+    porcentajeDescuentoTotal: 0,
+    valorVentaNetoTotal: 0,
+    igvTotal: 0,
+    precioVentaTotal: 0
+  })
+  const [isEditModalOpenDetVentas, setIsEditModalOpenDetVentas] = useState(false);
+  const [selectedRowsDet, setSelectedRowsDet] = useState([]);
+  const [fichaDataDetVentas, setFichaDataDetVentas] = useState({});
+  moment.locale('es'); // Configura Moment.js para utilizar el idioma en español
+  useEffect(() => {
+    prepararDataDetVentas();
+  },[detalleVentas]);
+  const prepararDataDetVentas = async() => {
+    let totales = {
+      valorVentaTotal: 0,
+      descuentoTotal: 0,
+      porcentajeDescuentoTotal: 0,
+      valorVentaNetoTotal: 0,
+      igvTotal: 0,
+      precioVentaTotal: 0
+    }
+    if (fichaDataVentas.moneda){
+      totales.valorVentaTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.vvUnitME*+curr.cantidad), 0);
+      totales.descuentoTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.descUnitME*+curr.cantidad), 0);
+      totales.valorVentaNetoTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.vvNetoTotME), 0);
+      totales.igvTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.igvTotalME), 0);
+      totales.precioVentaTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.pvTotalME), 0);
+      totales.porcentajeDescuentoTotal = (totales.descuentoTotal / totales.valorVentaTotal) * 100;
+    } else {
+      totales.valorVentaTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.vvUnitMN*+curr.cantidad), 0);
+      totales.descuentoTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.descUnitMN*+curr.cantidad), 0);
+      totales.valorVentaNetoTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.vvNetoTotMN), 0);
+      totales.igvTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.igvTotalMN), 0);
+      totales.precioVentaTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.pvTotalMN), 0);
+      totales.porcentajeDescuentoTotal = (totales.descuentoTotal / totales.valorVentaTotal) * 100;
+    }
+    let dataPreparada = detalleVentas.map((detVenta) => {
+      let totalesFormateado = {
+        valorVentaTotal: 0,
+        descuentoTotal: 0,
+        porcentajeDescuentoTotal: 0,
+        valorVentaNetoTotal: 0,
+        igvTotal: 0,
+        precioVentaTotal: 0
+      }
+      if (fichaDataVentas.moneda){
+        totalesFormateado.valorVentaTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.vvUnitME*+detVenta.cantidad)); 
+        totalesFormateado.descuentoTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.descUnitME*+detVenta.cantidad));
+        totalesFormateado.valorVentaNetoTotal = new Intl.NumberFormat('es-PE',{ minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.vvNetoTotME));
+        totalesFormateado.igvTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.igvTotalME));
+        // totalesFormateado.precioVentaTotal = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format((+detVenta.pvTotalME));
+        totalesFormateado.precioVentaTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.pvTotalME));
+        totalesFormateado.porcentajeDescuentoTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(((+detVenta.descUnitME*+detVenta.cantidad) / (+detVenta.vvUnitME*+detVenta.cantidad)) * 100);
+      } else {
+        totalesFormateado.valorVentaTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.vvUnitMN*+detVenta.cantidad)); 
+        totalesFormateado.descuentoTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.descUnitMN*+detVenta.cantidad));
+        totalesFormateado.valorVentaNetoTotal = new Intl.NumberFormat('es-PE',{ minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.vvNetoTotMN));
+        totalesFormateado.igvTotal = new Intl.NumberFormat('es-PE',{ minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.igvTotalMN));
+        totalesFormateado.precioVentaTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.pvTotalMN));
+        totalesFormateado.porcentajeDescuentoTotal = new Intl.NumberFormat('es-PE',{ minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(((+detVenta.descUnitMN*+detVenta.cantidad) / (+detVenta.vvUnitMN*+detVenta.cantidad)) * 100);
+      }
+        return {
+            producto: detVenta.Producto.descripcion,
+            cantidad: new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.cantidad)),
+            descuento: totalesFormateado.descuentoTotal,
+            pvtotal: totalesFormateado.precioVentaTotal,
+            vventa: totalesFormateado.valorVentaTotal,
+            descPorc: totalesFormateado.porcentajeDescuentoTotal,
+            vventaneto: totalesFormateado.valorVentaNetoTotal,
+            igv: totalesFormateado.igvTotal,
+            id: +detVenta.id,
+            };
+        });
+    let columns =[{
+                    field: 'producto',
+                    headerName: 'Producto',
+                    width: 350,
+                    editable: false,
+                    valueFormatter: (params) => `${params.value}`,
+                    align: 'left',
+                    headerAlign: 'center',
+                  },
+                  {
+                    field: 'cantidad',
+                    headerName: 'Cant.',
+                    width: 110,
+                    editable: false,
+                    valueFormatter: (params) => `${params.value}`,
+                    align: 'right',
+                    headerAlign: 'center',
+                  },
+                  {
+                    field: 'descuento',
+                    headerName: 'Desc.',
+                    width: 110,
+                    editable: false,
+                    valueFormatter: (params) => `${params.value}`,
+                    align: 'right',
+                    headerAlign: 'center',
+                  },
+                  {
+                    field: 'pvtotal',
+                    headerName: 'PV',
+                    width: 110,
+                    editable: false,
+                    valueFormatter: (params) => `${params.value}`,
+                    align: 'right',
+                    headerAlign: 'center',
+                  },
+                  {
+                    field: 'actions',
+                    headerName: '',
+                    width: 80,
+                    renderCell: (params) => (
+                        <>
+                            <IconButton onClick={() => handleEditDetVentas(params.row)}>
+                                <Edit />
+                            </IconButton>
+                            <IconButton onClick={() => handleDeleteDetVentas(params.row)}>
+                                <Delete />
+                            </IconButton>
+                        </>
+                    ),
+                  },
+                  {
+                    field: 'vventa',
+                    headerName: 'VVenta',
+                    width: 120,
+                    editable: false,
+                    valueFormatter: (params) => `${params.value}`,
+                    align: 'right',
+                    headerAlign: 'center',
+                  },
+                  {
+                    field: 'descPorc',
+                    headerName: '%Desc.',
+                    width: 120,
+                    editable: false,
+                    valueFormatter: (params) => `${params.value}`,
+                    align: 'right',
+                    headerAlign: 'center',
+                  },
+                  {
+                    field: 'vventaneto',
+                    headerName: 'VNeto',
+                    width: 120,
+                    editable: false,
+                    valueFormatter: (params) => `${params.value}`,
+                    align: 'right',
+                    headerAlign: 'center',
+                  },
+                  {
+                    field: 'igv',
+                    headerName: 'IGV',
+                    width: 100,
+                    editable: false,
+                    valueFormatter: (params) => `${params.value}`,
+                    align: 'right',
+                    headerAlign: 'center',
+                  },
+                  {
+                    field: 'id',
+                    headerName: 'ID',
+                    width: 120,
+                    editable: false,
+                    valueFormatter: (params) => `${params.value}`,
+                    align: 'right',
+                    headerAlign: 'center',
+                  }
+  ];
+    setDetTableData(dataPreparada);
+    setDetTableColumns(columns);
+    setTotalesCabVentas(totales);
 };
-console.log("results",results,"formData:", formData,selectedRow.id, results.find(objeto => +objeto.id === +selectedRow.id) );
+const handleEditDetVentas =  (row) => {
+  openEditModalDetVentas(); // Llama a la función openEditModalDetVentas para abrir el modal de edición
+  setFichaDataDetVentas(fichaDataVentas.DetVentas.find(objeto => +objeto.id === +row.id));
+};
+const handleDeleteDetVentas = (row) => {
+  console.log("row", row.id);
+};
+const handleShowDetVentas = (row) => {
+  console.log("row", row.id);
+};
+const openEditModalDetVentas = () => {
+  setIsEditModalOpenDetVentas(true);
+};
+const closeEditModalDetVentas = () => {
+  setIsEditModalOpenDetVentas(false);
+  if (fichaDataDetVentas){
+    let updatedArrayDetVentas = [...detalleVentas];
+    let indiceDataDetVentas=updatedArrayDetVentas.findIndex(obj => +obj.id === +fichaDataDetVentas.id);
+    updatedArrayDetVentas[indiceDataDetVentas]=fichaDataDetVentas;
+    setDetalleVentas(updatedArrayDetVentas);
+    let updatedArray = [...results];
+    let indiceDataVentas=updatedArray.findIndex(obj => +obj.id === +fichaDataVentas.id);
+    updatedArray[indiceDataVentas]=fichaDataVentas;
+    dispatch(setResults(updatedArray));
+    setFichaDataDetVentas({});
+    }
+};
+const handleSelectionChangeDetVentas = (newSelection) => {
+  setSelectedRowsDet(newSelection);
+};
+
+  const grabarCabVentas = async () => {
+    console.log("grabarCabVentas: fichaDataVentas",fichaDataVentas);
+    const datosCodificados = {
+      id: +fichaDataVentas.id,
+      fecha: formatDateStringToyyyymmdd(fichaDataVentas.fecha),
+      serieDcmto: fichaDataVentas.serieDcmto,
+      correlativoDcmto: fichaDataVentas.correlativoDcmto,
+      idContacto: +fichaDataVentas.idContacto,
+      idDirOrigen: +fichaDataVentas.idDirOrigen,
+      idDirEntrega: +fichaDataVentas.idDirEntrega,
+      observaciones: fichaDataVentas.observaciones,
+      idDocAlmacen: +fichaDataVentas.idDocAlmacen,
+      idVendedor: +fichaDataVentas.idVendedor,
+      idTecnico: +fichaDataVentas.idTecnico,
+      numPlacas: fichaDataVentas.numPlacas,
+      tipoCambio: +fichaDataVentas.tipoCambio,
+      porcentajeIGV: +fichaDataVentas.porcentajeIGV,
+      emailDestino: fichaDataVentas.emailDestino,
+      rutaDcmtoPDF: fichaDataVentas.rutaDcmtoPDF,
+      exonerado: fichaDataVentas.exonerado,
+      moneda: fichaDataVentas.moneda,
+      factElectOK: fichaDataVentas.factElectOK,
+      anticipo: fichaDataVentas.anticipo,
+      created: fichaDataVentas.created,
+      borradoLogico: fichaDataVentas.borradoLogico,
+      idHistorico: +fichaDataVentas.idHistorico,
+      ClienteProveedorId: +fichaDataVentas.ClienteProveedorId,
+      FormaPagoId: +fichaDataVentas.FormaPagoId,
+      EstadoDocId: +fichaDataVentas.EstadoDocId,
+      UsuarioId: +fichaDataVentas.UsuarioId,
+      TipoCambioId: +fichaDataVentas.TipoCambioId,
+      CentroCostoId: +fichaDataVentas.CentroCostoId,
+      CorrelativoDocId: +fichaDataVentas.CorrelativoDocId
+    };
+    console.log("datosCodificados",datosCodificados);
+    try {
+      let regCabVentasUpdated = await axios.put("http://localhost:3001/cabVentas/update/"+datosCodificados.id, datosCodificados);
+      console.log("regCabVentasUpdated",regCabVentasUpdated);
+      if (!regCabVentasUpdated.data) console.log("Error: No se pudo Actualizar la Informacion de la Cabecera de Ventas");
+    } catch (error) {
+      console.log("Error: En la solicitud Backend, Servidor de Base de Datos NO Responde",error);
+    }
+    console.log("grabarCabVentas: datosCodificados",datosCodificados);
+  }
+  const handleSubmitCabVentas = async () => {
+    // Aquí puedes manejar la lógica de guardar los cambios y cerrar el modal
+    await grabarCabVentas();
+    setSelectedRows([]); // Deseleccionar el registro en el DataGrid
+    setTotalesCabVentas([]);
+    onClose();
+  };
+  const handleCloseCabVentas = () => {
+    setSelectedRows([]); // Deseleccionar el registro en el DataGrid
+    setFichaDataVentas({});
+    setTotalesCabVentas([]);
+    onClose();
+  };
+//console.log("fichaDataVentas:", fichaDataVentas, fichaDataVentas.fecha,typeof fichaDataVentas.fecha);
+const handleChangeCabVentas = (event) => {
+  setFichaDataVentas({
+      ...fichaDataVentas,
+      [event.target.name]: event.target.value,
+  });
+};
+const handleChangefecha = (fechaNueva) => {
+  setFichaDataVentas({
+    ...fichaDataVentas,
+    fecha: moment(fechaNueva.$d).format('DD/MM/YYYY'),
+  });
+};
+const handleChangeBoolean = (event) => {
+  console.log("handleChangeBoolean",event.target)
+  setFichaDataVentas({
+    ...fichaDataVentas,
+    moneda: event.target.value,
+  });
+}
+const handleChangeDesc = (event, name)=>{
+  console.log("handleChangeDesc",event.floatValue,name)
+  setFichaDataVentas({
+    ...fichaDataVentas,
+    [name]: event.floatValue
+  });
+};
+//console.log("fichaDataVentas",fichaDataVentas);
   return (
-    <Dialog open={isOpen} onClose={handleClose} PaperProps={{ style: { maxWidth: '1000px', maxHeight: 'calc(100vh - 200px)', overflow: 'hidden' } }}>
-      <DialogTitle>Ficha de Venta</DialogTitle>
+    <Dialog className='dialogFichaVentas' open={isOpen} fullWidth maxWidth="md">
+      <DialogTitle>{fichaDataVentas.CorrelativoDoc.TipoDocumento.descripcion} ID:{fichaDataVentas.id}</DialogTitle>
       <DialogContent style={{ maxHeight: 'calc(100vh - 300px)', overflow: 'hidden' }}>
-        <Grid container spacing={2} justifyContent="center" alignItems="center" style={{margin: 'auto'}}>
+        <Grid className='campoInput' container spacing={2} justifyContent="center" alignItems="center" style={{margin: 'auto'}}>
           <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid item xs={1} style={cellStyle}>
-              <label >ID:</label>
+            <Grid item xs={3}>
+              <TextField  className="campoInput" margin='none' label="Serie Dcmto" variant="outlined" size="small" disabled={true} value={fichaDataVentas.serieDcmto} onChange={handleChangeCabVentas} />
             </Grid>
-            <Grid item xs={2} style={cellStyle}>
-              <input className="campoInput" type="number" name="id" value={formData.id} onChange={handleChange} />
+            <Grid item xs={3}>
+              <TextField className="campoInput" margin='none' label="N° Correlativo" variant="outlined" size="small" disabled={true} value={fichaDataVentas.correlativoDcmto} onChange={handleChangeCabVentas} />
             </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >Tipo Dcmto:</label>
+            <Grid item xs={3}>
+              <DatePicker className="campoInput" label="Fecha" format="DD/MM/YYYY" formatDensity='dense' size="small" value={dayjs(formatDateStringToyyyymmdd(fichaDataVentas.fecha))} onChange={(newValue) => handleChangefecha(newValue)} />
             </Grid>
-            <Grid item xs={2} style={cellStyle}>
-              <input className="campoInput" type="text" name="tipoDcmto" value={formData.CorrelativoDoc.TipoDocumento.descripcion} onChange={handleChange} />
+            <Grid item xs={1.5}>
+              <NumericFormat
+                margin='none'
+                variant='outlined'
+                disabled={true}
+                label="T/C"
+                value={fichaDataVentas.tipoCambio}
+                name='tipoCambio'
+                thousandSeparator=","
+                decimalSeparator="."
+                decimalScale={2}
+                fixedDecimalScale
+                prefix={""}
+                suffix=''
+                className="campoInput"
+                size="small"
+                customInput={TextField }
+              />
             </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >Serie:</label>
-            </Grid>
-            <Grid item xs={2} style={cellStyle}>
-              <input className="campoInput" type="text" name="serieDcmto" value={formData.serieDcmto} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >Correlativo:</label>
-            </Grid>
-            <Grid item xs={2} style={cellStyle}>
-              <input className="campoInput" type="text" name="correlativoDcmto" value={formData.correlativoDcmto} onChange={handleChange} />
+            <Grid item xs={1.5}>
+              <Select labelId="moneda" name="moneda" id="moneda" value={fichaDataVentas.moneda} label="Moneda" size="small" onChange={handleChangeBoolean}>
+                <MenuItem value={true}>{datosGlobales.descripCortaME}</MenuItem>
+                <MenuItem value={false}>{datosGlobales.descripCortaMN}</MenuItem>
+              </Select>
             </Grid>
           </Grid>
           <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid item xs={1} style={cellStyle}>
-              <label >Fecha:</label>
+            <Grid item xs={3.5}>
+              <TextField className="campoInput" margin='none' label="Cliente" variant="outlined" size="small" value={fichaDataVentas.ClienteProveedor.razonSocial} onChange={handleChangeCabVentas} />
             </Grid>
-            <Grid item xs={2} style={cellStyle}>
-              <input className="campoInput" type="date" name="fecha" value={formData.fecha} onChange={handleChange} />
+            <Grid item xs={2.5}>
+              <TextField className="campoInput" margin='none' label="Forma de Pago" variant="outlined" size="small" value={fichaDataVentas.FormaPago.descripcion} onChange={handleChangeCabVentas} />
             </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >Cliente:</label>
+            <Grid item xs={2}>
+              <TextField className="campoInput" margin='none' label="Vendedor" variant="outlined" size="small" value={fichaDataVentas.idVendedor} onChange={handleChangeCabVentas} />
             </Grid>
-            <Grid item xs={4} style={cellStyle}>
-              <input className="campoInput" type="text" name="cliente" value={formData.ClienteProveedor.razonSocial} onChange={handleChange} />
+            <Grid item xs={2}>
+              <TextField className="campoInput" margin='none' label="Tecnico" variant="outlined" size="small" value={fichaDataVentas.idTecnico} onChange={handleChangeCabVentas} />
             </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >Forma Pago:</label>
+            <Grid item xs={2}>
+              <NumericFormat
+                margin='none'
+                variant='outlined'
+                disabled={false}
+                label="% IGV"
+                value={fichaDataVentas.porcentajeIGV}
+                name='porcentajeIGV'
+                thousandSeparator=","
+                decimalSeparator="."
+                decimalScale={2}
+                fixedDecimalScale
+                prefix={""}
+                suffix='%'
+                className="campoInput"
+                size="small"
+                customInput={TextField }
+                onValueChange={handleChangeCabVentas}
+              />
             </Grid>
-            <Grid item xs={3} style={cellStyle}>
-              <input className="campoInput" type="text" name="formaPago" value={formData.FormaPago.descripcion} onChange={handleChange} />
+          </Grid>
+          <div className='container-detdatagrid'>
+                <div className='detdata-datagrid'>
+                    <DataGrid 
+                        className='data-detventas' 
+                        rows={detTableData} 
+                        columns={detTableColumns}
+                        initialState={{
+                            pagination: {
+                            paginationModel: { page: 0, pageSize: 4 },
+                            },
+                        }}
+                        pageSizeOptions={[4,8,12,16,20]}
+                        // checkboxSelection
+                        density='compact'
+                        rowSelectionModel={selectedRowsDet}
+                        onRowSelectionModelChange={handleSelectionChangeDetVentas}
+                    />
+                    {isEditModalOpenDetVentas && (
+                        <FichaDetVentasModal 
+                            isOpen={isEditModalOpenDetVentas}
+                            onClose={() => closeEditModalDetVentas()}
+                            setSelectedRowsDet={setSelectedRowsDet}
+                            fichaDataDetVentas={fichaDataDetVentas}
+                            setFichaDataDetVentas={setFichaDataDetVentas}
+                            fichaDataVentas={fichaDataVentas}
+                        />
+                    )}
+                </div>
+          </div>
+          <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+            <Grid item xs={4}>
+              {/* <TextField className="campoInput" margin='none' label="V.Venta" variant="outlined" size="small" disabled={true} InputProps={{ startAdornment: <InputAdornment position="start">{fichaDataVentas.moneda?"US$":"S/."}</InputAdornment> }} value={valorVentaTotal} onChange={handleChangeCabVentas} /> */}
+              <NumericFormat
+                margin='none'
+                variant='outlined'
+                disabled={true}
+                label="V.Venta"
+                value={totalesCabVentas.valorVentaTotal}
+                name='valorVentaTotal'
+                thousandSeparator=","
+                decimalSeparator="."
+                decimalScale={2}
+                fixedDecimalScale
+                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+                suffix=''
+                className="campoInput"
+                size="small"
+                customInput={TextField }
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <NumericFormat
+                margin='none'
+                variant='outlined'
+                disabled={false}
+                label="Descuento"
+                value={totalesCabVentas.descuentoTotal}
+                name='descuentoTotal'
+                thousandSeparator=","
+                decimalSeparator="."
+                decimalScale={2}
+                fixedDecimalScale
+                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+                suffix=''
+                className="campoInput"
+                size="small"
+                customInput={TextField }
+                onValueChange={(values) => handleChangeDesc(values, "descuentoTotal")}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <NumericFormat
+                margin='none'
+                variant='outlined'
+                disabled={false}
+                label="% Desc."
+                value={totalesCabVentas.porcentajeDescuentoTotal}
+                name='porcentajeDescuentoTotal'
+                thousandSeparator=","
+                decimalSeparator="."
+                decimalScale={2}
+                fixedDecimalScale
+                prefix={""}
+                suffix='%'
+                className="campoInput"
+                size="small"
+                customInput={TextField }
+                onValueChange={(values) => handleChangeDesc(values, "porcentajeDescuentoTotal")}
+              />
             </Grid>
           </Grid>
           <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid item xs={1} style={cellStyle}>
-              <label >Vendedor:</label>
+            <Grid item xs={4}>
+              <NumericFormat
+                margin='none'
+                variant='outlined'
+                disabled={true}
+                label="V.V.Neto"
+                value={totalesCabVentas.valorVentaNetoTotal}
+                name='valorVentaNetoTotal'
+                thousandSeparator=","
+                decimalSeparator="."
+                decimalScale={2}
+                fixedDecimalScale
+                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+                suffix=''
+                className="campoInput"
+                size="small"
+                customInput={TextField }
+              />
             </Grid>
-            <Grid item xs={2} style={cellStyle}>
-              <input className="campoInput" type="number" name="idVendedor" value={formData.idVendedor} onChange={handleChange} />
+            <Grid item xs={4}>
+              <NumericFormat
+                margin='none'
+                variant='outlined'
+                disabled={true}
+                label="IGV"
+                value={totalesCabVentas.igvTotal}
+                name='igvTotal'
+                thousandSeparator=","
+                decimalSeparator="."
+                decimalScale={2}
+                fixedDecimalScale
+                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+                suffix=''
+                className="campoInput"
+                size="small"
+                customInput={TextField }
+              />
             </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >Tecnico:</label>
-            </Grid>
-            <Grid item xs={2} style={cellStyle}>
-              <input className="campoInput" type="number" name="idTecnico" value={formData.idTecnico} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >Moneda:</label>
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <input className="campoInput" type="boolean" name="moneda" value={formData.moneda} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >T/C:</label>
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <input className="campoInput" type="number" name="tipoCambio" value={formData.tipoCambio} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >%IGV:</label>
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <input className="campoInput" type="number" name="porcentajeIGV" value={formData.porcentajeIGV} onChange={handleChange} />
-            </Grid>
-          </Grid>
-          <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid item xs={1} style={cellStyle}>
-              <label >V.Venta:</label>
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <input className="campoInput" type="number" name="valorVentaTotal" value={valorVentaTotal} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >Descuento:</label>
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <input className="campoInput" type="number" name="descuentoTotal" value={descuentoTotal} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >% Descuento:</label>
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <input className="campoInput" type="number" name="porcentajeDescuentoTotal" value={porcentajeDescuentoTotal} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >V.V.Neto:</label>
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <input className="campoInput" type="number" name="valorVentaNetoTotal" value={valorVentaNetoTotal} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >IGV:</label>
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <input className="campoInput" type="number" name="igvTotal" value={igvTotal} onChange={handleChange} />
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <label >P.Venta:</label>
-            </Grid>
-            <Grid item xs={1} style={cellStyle}>
-              <input className="campoInput" type="number" name="precioVentaTotal" value={precioVentaTotal} onChange={handleChange} />
+            <Grid item xs={4}>
+                <NumericFormat
+                margin='none'
+                variant='outlined'
+                disabled={true}
+                label="P.V.Total"
+                value={totalesCabVentas.precioVentaTotal}
+                name='precioVentaTotal'
+                thousandSeparator=","
+                decimalSeparator="."
+                decimalScale={2}
+                fixedDecimalScale
+                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+                suffix=''
+                className="campoInput"
+                size="small"
+                customInput={TextField }
+              />
             </Grid>
           </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancelar</Button>
-        <Button onClick={handleSubmit}>Guardar</Button>
+        <Button variant="contained" color="error" size="small" onClick={handleCloseCabVentas}>Cancelar</Button>
+        <Button variant="contained" color="success" size="small" onClick={handleSubmitCabVentas}>Guardar</Button>
       </DialogActions>
     </Dialog>
   );

@@ -54,8 +54,12 @@ function ContentControllers() {
   };
   return (
     <div className="search-bar">
-      <SearchBar placeholder="Codigo Barras" setInput={setInputCodigoBarras}/>
-      <SearchBar placeholder="Descripción" setInput={setInputSearch}/>
+      <div>
+        <SearchBar placeholder="Codigo Barras" setInput={setInputCodigoBarras}/>
+      </div>
+      <div>
+        <SearchBar placeholder="Descripción" setInput={setInputSearch}/>
+      </div>
       <div className='searchbar-buttons'>
         <div>
           <button onClick={handleReloadClick}>

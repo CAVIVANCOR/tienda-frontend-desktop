@@ -13,19 +13,19 @@ function ContentTotals() {
   const totalPages = useSelector((state) => state.inicio.totalPages);
 
   const handlePreviousPage = () => {
-    dispatch(setCurrentPage(prevPage => prevPage > 1 ? prevPage - 1 : prevPage));
+    dispatch(setCurrentPage((currentPage > 1) ? (currentPage - 1) : currentPage));
   };
 
   const handleNextPage = () => {
-    dispatch(setCurrentPage(prevPage => prevPage < totalPages ? prevPage + 1 : prevPage));
+    dispatch(setCurrentPage((currentPage < totalPages) ? (currentPage + 1) : currentPage));
   };
   const handleFirstPage = () => {
     dispatch(setCurrentPage(1));
   };
-
   const handleLastPage = () => {
     dispatch(setCurrentPage(totalPages));
   };
+  console.log("entro a ContentTotals", currentPage, totalPages);
   return (
     <div className="content-pagination">
             {totalPages>0 && 

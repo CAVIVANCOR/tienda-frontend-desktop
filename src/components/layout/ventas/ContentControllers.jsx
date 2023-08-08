@@ -3,13 +3,16 @@ import React, { useEffect } from 'react'
 import './ContentControllers.css';
 import SearchBar from '../../layout/global/SearchBar';
 import imagenLimpieza from '../../../icons/limpieza.png';
-import imagenReload from '../../../icons/reload.png';
 import axios from "axios";
 import { setInputSearch, setResults, inicializarInicio } from '../../../redux/features/task/inicio';
 import { useDispatch, useSelector } from 'react-redux';
+import moment from 'moment';
+import 'moment/locale/es'; // Importa el idioma si lo necesitas
 function ContentControllers() {
   const inicioInputSearch = useSelector((state) => state.inicio.inputSearch);
   const dispatch = useDispatch();
+  moment.locale('es'); // Configura Moment.js para utilizar el idioma en español
+
   useEffect(() => {
     if (inicioInputSearch!=="") buscarVentas({razonSocial:inicioInputSearch});
   }, [inicioInputSearch]);
@@ -17,13 +20,14 @@ function ContentControllers() {
     let response =[];
       try {
           if (buscar!=="") {
-            console.log("Entro a BuscarVentas",buscar)
+           // console.log("Entro a BuscarVentas",buscar)
               response = await axios.post("http://localhost:3001/cabVentas/search", buscar);
               if (response.data.length > 0) {
                 const resultsWithDate = response.data.map(item => {
+                  let formattedDate = moment(item.fecha).format('DD/MM/YYYY');
                   return {
                     ...item,
-                    fecha: new Date(item.fecha).toISOString() // Aquí se asume que el campo fecha es una cadena de texto con el formato adecuado para crear un objeto Date
+                    fecha: formattedDate,
                   }
                 });
                 dispatch(setResults(resultsWithDate));
@@ -38,15 +42,6 @@ function ContentControllers() {
           console.log("Error: En la solicitud Backend, Servidor de Base de Datos NO Responde",error);
       }
   };
-  const handleReloadClick = () => {
-    if (inicioInputSearch!==""){
-      dispatch(setResults([]));
-      if (inicioInputSearch!==""){
-        setInputSearch(inicioInputSearch+" ");
-      }
-    }
-  };
-
   const handleCleanClick = () => {
     dispatch(inicializarInicio());
   };

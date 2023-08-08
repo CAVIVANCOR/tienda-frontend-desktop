@@ -1,67 +1,69 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
 import { IconButton } from '@mui/material';
 import { Edit, Delete, Visibility } from '@mui/icons-material';
 import './ListaVentasTableGrid.css';
 import FichaVentasModal from './FichaVentasModal';
+import { setResults } from '../../../redux/features/task/inicio';
 
 function ListaVentasTableGrid() {
     const results = useSelector((state) => state.inicio.results);
+    const dispatch = useDispatch();
     const [tableData, setTableData] = useState([]);
     const [tableColumns, setTableColumns] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedRow, setSelectedRow] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
+    const [fichaDataVentas, setFichaDataVentas] = useState({});
+
     useEffect(() => {
-        prepararData();
+        prepararDataCabVentas();
     }, [results]);
-    const prepararData = async() => {
-        console.log("Entro useEffect", results);
+    const prepararDataCabVentas = async() => {
         let dataPreparada = results.map((venta) => {
             let total = venta.DetVentas.reduce((prev, curr) => prev + +curr.pvTotalMN, 0);
             let totalFormateado = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(total); // Formatear el campo total como "999,999.00"
             //let totalFormateado = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'USD' }).format(total);
-            let fechaVenta = new Date(venta.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }); // Formatear la fecha en 'dd/mm/yyyy'
             return {
                 id: +venta.id,
                 serie: venta.serieDcmto,
                 num: venta.correlativoDcmto,
-                fecha: fechaVenta,
+                fecha: venta.fecha,
                 cliente: venta.ClienteProveedor.razonSocial,
                 pvtotal: totalFormateado,
                 };
             });
         let columns = Object.keys(dataPreparada[0]).map((key) => {
-            let anchoColumna = 150; // Ancho predeterminado
-            // Verificar si el valor es numérico
-            if (typeof dataPreparada[0][key] === 'number') {
-                anchoColumna = 90;
-            } else if (typeof dataPreparada[0][key] === 'string') {
-                // Calcular el ancho promedio de la longitud máxima del campo
-                let maxLength = dataPreparada.reduce((max, item) => Math.max(max, item[key].length), 0);
-                let averageWidth = maxLength * 8; // Puedes ajustar este valor según tus necesidades
-                // Verificar si la longitud es menor o igual a 10
-                if (maxLength <= 10) {
-                    anchoColumna = maxLength*15;
-                } else {
-                    anchoColumna = Math.max(anchoColumna, averageWidth);
-                }
-            } else if (dataPreparada[0][key] instanceof Date) {
-                anchoColumna = 120; // Ancho para columnas de fecha
-            }
-            if (key === 'pvtotal') {
-                return {
-                    field: key,
-                    headerName: key,
-                    width: anchoColumna,
-                    editable: false,
-                    valueFormatter: (params) => `${params.value}`,
-                    align: 'right',
-                    renderCell: (params) => (<div style={{ textAlign: 'right' }}>{params.value}</div>),
-                    headerAlign: 'center',
-                };
+            let anchoColumna = 0;
+            switch (key) {
+                case 'id':
+                    anchoColumna = 120; 
+                    break;
+                case 'serie':
+                    anchoColumna = 120; 
+                    break;
+                case 'num':
+                    anchoColumna = 120; 
+                    break;
+                case 'fecha':
+                    anchoColumna = 120; 
+                    break;
+                case 'cliente':
+                    anchoColumna = 250; 
+                    break;
+                case 'pvtotal':
+                    anchoColumna = 120; 
+                    return {
+                        field: key,
+                        headerName: key,
+                        width: anchoColumna,
+                        editable: false,
+                        valueFormatter: (params) => `${params.value}`,
+                        align: 'right',
+                        renderCell: (params) => (<div style={{ textAlign: 'right' }}>{params.value}</div>),
+                        headerAlign: 'center',
+                    };
             }
             return {
                 field: key,
@@ -94,10 +96,9 @@ function ListaVentasTableGrid() {
         setTableData(dataPreparada);
         setTableColumns(columns);
     };
-    const handleEdit = (row) => {
+    const handleEdit =  (row) => {
         openEditModal(); // Llama a la función openEditModal para abrir el modal de edición
-        setSelectedRow(row);
-        console.log("row", row.id);
+        setFichaDataVentas(results.find(objeto => +objeto.id === +row.id));
     };
     const handleDelete = (row) => {
         console.log("row", row.id);
@@ -110,11 +111,21 @@ function ListaVentasTableGrid() {
     };
     const closeEditModal = () => {
         setIsEditModalOpen(false);
+        console.log("Entro closeEditModal",fichaDataVentas);
+        if (fichaDataVentas){
+            let updatedArray = [...results];
+            console.log("updatedArray antes",updatedArray);
+            let indiceDataVentas=updatedArray.findIndex(obj => +obj.id === +fichaDataVentas.id);
+            updatedArray[indiceDataVentas]=fichaDataVentas;
+            console.log("updatedArray despues",updatedArray);
+            dispatch(setResults(updatedArray));
+            setFichaDataVentas({});
+        }
     };
     const handleSelectionChange = (newSelection) => {
         setSelectedRows(newSelection);
     };
-    console.log("tableData:", tableData,"tableColumns:", tableColumns);
+    //console.log("tableData:", tableData,"tableColumns:", tableColumns);
     return (
             <div className='container-datagrid'>
                 <div className='data-datagrid'>
@@ -124,11 +135,12 @@ function ListaVentasTableGrid() {
                         columns={tableColumns}
                         initialState={{
                             pagination: {
-                            paginationModel: { page: 0, pageSize: 7 },
+                            paginationModel: { page: 0, pageSize: 10 },
                             },
                         }}
-                        pageSizeOptions={[7, 14,21,28,35]}
-                        checkboxSelection
+                        pageSizeOptions={[10, 20,30,40,50]}
+                        // checkboxSelection
+                        density='compact'
                         rowSelectionModel={selectedRows}
                         onRowSelectionModelChange={handleSelectionChange}
                     />
@@ -136,9 +148,9 @@ function ListaVentasTableGrid() {
                         <FichaVentasModal 
                             isOpen={isEditModalOpen}
                             onClose={() => closeEditModal()}
-                            selectedRow={selectedRow}
-                            setSelectedRow={setSelectedRow} // Pasar la función setSelectedRow como prop
                             setSelectedRows={setSelectedRows}
+                            fichaDataVentas={fichaDataVentas}
+                            setFichaDataVentas={setFichaDataVentas}
                         />
                     )}
                 </div>

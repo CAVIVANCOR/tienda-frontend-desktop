@@ -44,34 +44,32 @@
 
 @media (max-width: 768px) {
   .content-controllers {
-    width:auto;
-    
+    width:100%;
+    height: 100%;
   }
   .content-data {
-    height: 400px;
-    width:600px;
+    width:100%;
+    height: 100%;
   }
-  
   .content-totals {
-    height: 60px;
-    width:600px;
+    width:100%;
+    height: 100%;
   }
 }
 
 @media (max-width: 480px) {
   .content-controllers {
-    width: auto;
-    height: auto;
+    width: 380px;
+    height: 100%;
     
   }
   .content-data {
-    width:min-content;
-    height: auto;
+    width:380px;
+    height: 100%;
 
   }
-  
   .content-totals {
-    height: 60px;
-    width:350px;
+    width:380;
+    height: 100%;
   }
 }

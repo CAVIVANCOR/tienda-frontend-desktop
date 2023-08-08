@@ -1,5 +1,5 @@
 .container-datagrid {
-  width: 1000px;
+  max-width: 1440px;
   height: 100%;
   margin: auto;
   display: flex;
@@ -10,53 +10,28 @@
 
 .data-datagrid {
   background-color: var(--container-color);
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
 }
-
 .MuiDataGrid-columnHeaders{
   background-color: var(--border-color);
 }
-
 .data-ventas{
   background-color: var(--text-color);
-
 }
-  /* Estilos responsivos para pantallas con un ancho máximo de 768px */
-  @media (max-width: 768px) {
-    .container-datagrid {
-      width: 600px;
-      height: 400px;
-      margin: auto;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .data-datagrid {
-      background-color: var(--container-color);
-      width: 100%;
-      height: 100%;
-    }
+/* Estilos responsivos para pantallas con un ancho máximo de 768px */
+@media (max-width: 768px) {
+  .container-datagrid {
+    max-width: 600px;
+    height: 100%;
   }
-  
-  /* Estilos responsivos para pantallas con un ancho máximo de 480px */
-  @media (max-width: 480px) {
-    .container-datagrid {
-      width: 380px;
-      height: 500px;
-      margin: auto;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .data-datagrid {
-      background-color: var(--container-color);
-      width: 100%;
-      height: 100%;
-    }
+}
+
+/* Estilos responsivos para pantallas con un ancho máximo de 480px */
+@media (max-width: 480px) {
+  .container-datagrid {
+    max-width: 380px;
+    height: 100%;
   }
+}
   

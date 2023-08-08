@@ -11,6 +11,9 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { CssBaseline } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import 'dayjs/locale/en-gb'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <GoogleOAuthProvider clientId='924946124685-92bdkbi61jpsgnt3vdhq00cd69ot4i5n.apps.googleusercontent.com'>
@@ -18,7 +21,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <BrowserRouter>
         <CssBaseline />
-        <App />
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
+            <App />
+          </LocalizationProvider>
       </BrowserRouter>
     </Provider>
   </React.StrictMode>

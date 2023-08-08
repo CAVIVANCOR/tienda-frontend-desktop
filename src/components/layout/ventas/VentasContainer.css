@@ -14,21 +14,21 @@
 body {
   top: 0;
   display: flex;
-  justify-content: center; /* Centrar horizontalmente */
-  align-items: center; /* Centrar verticalmente */
+  justify-content: center;
+  align-items: center;
   align-content: center;
-  height: 100vh; /* Ajustar la altura al viewport */
-  margin: 0; /* Eliminar los márgenes predeterminados */
+  height: 100vh; 
+  margin: 0; 
   background-color: var(--container-color);
   overflow-y: auto;
 }
 .main-container-layout {
+  max-width:1440px;
+  height:100%;
   display:flex;
   flex-direction:column;
   align-items: center; /* Centrar verticalmente */
   align-content: center;
-  width:100%;
-  height:100%;
   background-color: var(--container-color);
   color:#333;
 }
@@ -44,7 +44,7 @@ body {
 }
 .navbar {
   width:100%;
-  height:auto;
+  height:100%;
   margin-top:auto;
   background-color: var(--navbar-color);
   padding: 2px;
@@ -55,9 +55,9 @@ body {
   margin-bottom:auto;
 }
 .main-content {
+  max-width:100%;
+  height: 100%;
   margin-top:auto;
-  width:100%;
-height: 100%;
   background-color: var(--container-color);
   padding: 2px;
   border: 1px solid var(--body-color);
@@ -72,4 +72,14 @@ height: 100%;
   border: 1px solid var(--body-color);
   border-radius: 5px;
   margin-bottom:auto;
+}
+
+/* Estilos responsivos para pantallas con un ancho máximo de 768px */
+@media (max-width: 768px) {
+
+}
+
+/* Estilos responsivos para pantallas con un ancho máximo de 480px */
+@media (max-width: 480px) {
+
 }
