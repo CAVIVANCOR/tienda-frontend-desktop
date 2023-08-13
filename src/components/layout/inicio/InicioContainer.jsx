@@ -1,27 +1,47 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
-import Header from "../global/Header";
 import Footer from "../global/Footer";
 import Content from "./Content";
-import NavBar from "../global/Navbar";
-import './InicioContainer.css';
+import ResponsiveAppBar from "../global/ResponsiveAppBar";
+import { Box, Container } from "@mui/material";
+import styled from "@emotion/styled";
+
+const ContainerWrapper = styled(Container)({
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  marginTop: "0.5rem",
+  width: "100%",
+  height: "100%",
+  backgroundColor: "#A9A9A9",
+  borderRadius: "1.5rem",
+});
+
+const ContentContainer = styled(Box)({
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  marginTop: "0.5rem",
+  width: "100%",
+  height: "100%",
+  backgroundColor: "#5c7d9c",
+  borderRadius: "1.5rem",
+});
+
+
 const InicioContainer = () => {
-  console.log("Hola entro a MainContainer");
   return (
-    <main className="main-container-layout">
-      <header className="header-container">
-        <Header/>
-      </header>
-      <nav className="navbar">
-        <NavBar />
-      </nav>
-      <section className="main-content">
-        <Content />
-      </section>
-      <footer className="footer-container">
-        <Footer/>
-      </footer>
-    </main>
+    <Box sx={{ flexGrow: 1 }}>
+      <ContainerWrapper>
+        <ResponsiveAppBar />
+        <ContentContainer>
+          <Content />
+        </ContentContainer>
+        <Footer />
+      </ContainerWrapper>
+    </Box>
   );
 };
 

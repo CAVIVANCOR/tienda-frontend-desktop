@@ -7,6 +7,7 @@ import 'moment/locale/es'; // Importa el idioma si lo necesitas
 import axios from 'axios';
 import { NumericFormat } from 'react-number-format';
 import { useSelector } from 'react-redux';
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 function FichaDetVentasModal({ isOpen, onClose, setSelectedRowsDet, fichaDataDetVentas, setFichaDataDetVentas, fichaDataVentas }) {
   const datosGlobales = useSelector((state) => state.datosGlobales.data);
 
@@ -87,9 +88,9 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
     <Dialog className='dialogDetVentas' open={isOpen} fullWidth maxWidth="md">
       <DialogTitle className='dialogTitleDetVentas'>Ficha Detalle de Venta</DialogTitle>
       <DialogContent className='dialogContentDetVentas'>
-        <Grid container spacing={2} justifyContent="center" alignItems="center" style={{margin: 'auto'}}>
-          <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid item xs={12}>
+        <Grid2 container spacing={2} justifyContent="center" alignItems="center" style={{margin: 'auto'}}>
+          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+            <Grid2 xs={12}>
               <Card className='cardDetVentas'>
                 <CardHeader align="center" title={fichaDataDetVentas.Producto.descripcion} subheader={"ID:"+fichaDataDetVentas.ProductoId}/>
                 <CardMedia className='cardMediaDetVentas' component="img" src={imgProducto} title={fichaDataDetVentas.Producto.descripcion} />
@@ -97,8 +98,8 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                   <Typography sx={{marginBottom:2, marginTop:0, borderColor: 'primary.main'}}gutterBottom align="center" variant="subtitle1" color="textSecondary" component="h6">
                     Cod.Prov.: {fichaDataDetVentas.Producto.codigoProveedor}  Modelo: {fichaDataDetVentas.modeloFabricante}
                   </Typography>
-                  <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
-                    <Grid item xs={4}>
+                  <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+                    <Grid2 xs={4}>
                       <NumericFormat
                         margin='none'
                         variant='outlined'
@@ -117,8 +118,8 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                         customInput={TextField }
                         onValueChange={handleChange}
                       />
-                    </Grid>
-                    <Grid item xs={4}>
+                    </Grid2>
+                    <Grid2 xs={4}>
                       <NumericFormat
                         margin='none'
                         variant='outlined'
@@ -137,14 +138,14 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                         customInput={TextField }
                         onValueChange={handleChange}
                       />
-                    </Grid>
-                  </Grid>
+                    </Grid2>
+                  </Grid2>
                 </CardContent>
               </Card>
-            </Grid>           
-          </Grid>
-          <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid item xs={4}>
+            </Grid2>           
+          </Grid2>
+          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -163,8 +164,8 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 customInput={TextField }
                 onValueChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={4}>
+            </Grid2>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -183,8 +184,8 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 customInput={TextField }
                 onValueChange={(values) => handleChangeDesc(values, "porcentajeDescUnit")}
                 />
-            </Grid>
-            <Grid item xs={4}>
+            </Grid2>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -203,10 +204,10 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 customInput={TextField }
                 onValueChange={(values) => handleChangeDesc(values, fichaDataVentas.moneda?"descUnitMontoME":"descUnitMontoMN")}
               />
-            </Grid>
-          </Grid>
-          <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid item xs={4}>
+            </Grid2>
+          </Grid2>
+          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -225,8 +226,8 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 customInput={TextField }
                 onValueChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={4}>
+            </Grid2>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -245,8 +246,8 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 customInput={TextField }
                 onValueChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={4}>
+            </Grid2>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -265,10 +266,10 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 customInput={TextField }
                 onValueChange={handleChange}
               />
-            </Grid>
-          </Grid>
-          <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid item xs={4}>
+            </Grid2>
+          </Grid2>
+          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -287,8 +288,8 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 customInput={TextField }
                 onValueChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={4}>
+            </Grid2>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -307,8 +308,8 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 customInput={TextField }
                 onValueChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={4}>
+            </Grid2>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -327,9 +328,9 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 customInput={TextField }
                 onValueChange={handleChange}
               />
-            </Grid>
-          </Grid>
-        </Grid>
+            </Grid2>
+          </Grid2>
+        </Grid2>
       </DialogContent>
       <DialogActions>
         <Button variant="contained" color="error" size="small" onClick={handleCloseDetVentas}>Cancelar</Button>

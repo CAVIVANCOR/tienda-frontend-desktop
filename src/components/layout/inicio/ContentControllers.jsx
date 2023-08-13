@@ -1,79 +1,59 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect } from 'react'
-import './ContentControllers.css';
 import SearchBar from '../../layout/global/SearchBar';
-import imagenLimpieza from '../../../icons/limpieza.png';
-import imagenReload from '../../../icons/reload.png';
 import axios from "axios";
 import { setInputSearch, setInputCodigoBarras, setResults, inicializarInicio } from '../../../redux/features/task/inicio';
 import { useDispatch, useSelector } from 'react-redux';
+import { Box } from '@mui/material';
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
+
 function ContentControllers() {
   const inicioInputSearch = useSelector((state) => state.inicio.inputSearch);
   const inicioInputCodigoBarras = useSelector((state) => state.inicio.inputCodigoBarras);
   const dispatch = useDispatch();
   useEffect(() => {
-    if (inicioInputSearch!=="") buscarProducto({descripcion:inicioInputSearch});
+    if (inicioInputSearch!==""){
+      buscarProducto({descripcion:inicioInputSearch});
+    }else{
+      handleCleanClick();
+    }
   }, [inicioInputSearch]);
 
   useEffect(() => {
-    if (inicioInputCodigoBarras!=="") buscarProducto({codigoProveedor:inicioInputCodigoBarras});
+    if (inicioInputCodigoBarras!==""){
+      buscarProducto({codigoProveedor:inicioInputCodigoBarras});
+    }else{
+      handleCleanClick();
+    }
   }, [inicioInputCodigoBarras]);
   const buscarProducto = async (buscar) => {
       try {
-          if (buscar!=="") {
-            console.log("*************Entro a BuscarProducto",buscar)
-              let response = await axios.post("http://localhost:3001/productos/search", buscar);
-              if (response.data.length > 0) {
-                dispatch(setResults(response.data));
-              } else {
-                  console.log("Error: No se encontro ningun registro");
-              }
-          }else{
-              console.log("Error: Debe enviar una descripción");
-              handleCleanClick();
-          }
+            let response = await axios.post("http://localhost:3001/productos/search", buscar);
+            if (response.data.length > 0) {
+              dispatch(setResults(response.data));
+            } else {
+                console.log("Error: No se encontro ningun registro");
+                handleCleanClick();
+            }
       } catch (error) {
           console.log("Error: En la solicitud Backend, Servidor de Base de Datos NO Responde",error);
       }
   };
-  const handleReloadClick = () => {
-    if (inicioInputSearch!==""){
-      dispatch(setResults([]));
-      if (inicioInputSearch!==""){
-        setInputSearch(inicioInputSearch+" ");
-      }
-    }
-    if (inicioInputCodigoBarras!==""){
-      dispatch(setResults([]));
-      setInputCodigoBarras(inicioInputCodigoBarras+" ");
-    }
-  };
-
   const handleCleanClick = () => {
     dispatch(inicializarInicio());
   };
+console.log("Entro a ContentControllers");
   return (
-    <div className="search-bar">
-      <div>
-        <SearchBar placeholder="Codigo Barras" setInput={setInputCodigoBarras}/>
-      </div>
-      <div>
-        <SearchBar placeholder="Descripción" setInput={setInputSearch}/>
-      </div>
-      <div className='searchbar-buttons'>
-        <div>
-          <button onClick={handleReloadClick}>
-            <img src={imagenReload} alt="Reload Barra Search" />
-          </button>
-        </div>
-        <div>
-          <button onClick={handleCleanClick}>
-            <img src={imagenLimpieza} alt="Limpiar Barra Search" />
-          </button>
-        </div>
-      </div>
-    </div>
+    <Box ml={2} mr={2} mt={1} sx={{ flexGrow: 1 }}>
+      <Grid2 container spacing={2}>
+        <Grid2 xs={6}>
+          <SearchBar placeholder="Cod.Barras" setInput={setInputCodigoBarras}/>
+        </Grid2>
+        <Grid2 xs={6}>
+          <SearchBar placeholder="Descripción" setInput={setInputSearch}/>
+        </Grid2>
+      </Grid2>
+    </Box>
   )
 }
-
 export default ContentControllers

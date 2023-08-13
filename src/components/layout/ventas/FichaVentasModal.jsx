@@ -12,10 +12,11 @@ import axios from 'axios';
 import {formatDateStringToyyyymmdd} from '../../../utilities/utilities';
 import { NumericFormat } from 'react-number-format';
 import { DataGrid } from '@mui/x-data-grid';
-import { Delete, Edit, Visibility } from '@mui/icons-material';
+import { Delete, Edit } from '@mui/icons-material';
 import FichaDetVentasModal from './FichaDetVentasModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { setResults } from '../../../redux/features/task/inicio';
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, setFichaDataVentas }) {
   const results = useSelector((state) => state.inicio.results);
   const datosGlobales = useSelector((state) => state.datosGlobales.data);
@@ -320,18 +321,18 @@ const handleChangeDesc = (event, name)=>{
     <Dialog className='dialogFichaVentas' open={isOpen} fullWidth maxWidth="md">
       <DialogTitle>{fichaDataVentas.CorrelativoDoc.TipoDocumento.descripcion} ID:{fichaDataVentas.id}</DialogTitle>
       <DialogContent style={{ maxHeight: 'calc(100vh - 300px)', overflow: 'hidden' }}>
-        <Grid className='campoInput' container spacing={2} justifyContent="center" alignItems="center" style={{margin: 'auto'}}>
-          <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid item xs={3}>
+        <Grid2 className='campoInput' container spacing={2} justifyContent="center" alignItems="center" style={{margin: 'auto'}}>
+          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+            <Grid2 xs={3}>
               <TextField  className="campoInput" margin='none' label="Serie Dcmto" variant="outlined" size="small" disabled={true} value={fichaDataVentas.serieDcmto} onChange={handleChangeCabVentas} />
-            </Grid>
-            <Grid item xs={3}>
+            </Grid2>
+            <Grid2 xs={3}>
               <TextField className="campoInput" margin='none' label="N° Correlativo" variant="outlined" size="small" disabled={true} value={fichaDataVentas.correlativoDcmto} onChange={handleChangeCabVentas} />
-            </Grid>
-            <Grid item xs={3}>
+            </Grid2>
+            <Grid2 xs={3}>
               <DatePicker className="campoInput" label="Fecha" format="DD/MM/YYYY" formatDensity='dense' size="small" value={dayjs(formatDateStringToyyyymmdd(fichaDataVentas.fecha))} onChange={(newValue) => handleChangefecha(newValue)} />
-            </Grid>
-            <Grid item xs={1.5}>
+            </Grid2>
+            <Grid2 xs={1.5}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -349,28 +350,28 @@ const handleChangeDesc = (event, name)=>{
                 size="small"
                 customInput={TextField }
               />
-            </Grid>
-            <Grid item xs={1.5}>
+            </Grid2>
+            <Grid2 xs={1.5}>
               <Select labelId="moneda" name="moneda" id="moneda" value={fichaDataVentas.moneda} label="Moneda" size="small" onChange={handleChangeBoolean}>
                 <MenuItem value={true}>{datosGlobales.descripCortaME}</MenuItem>
                 <MenuItem value={false}>{datosGlobales.descripCortaMN}</MenuItem>
               </Select>
-            </Grid>
-          </Grid>
-          <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid item xs={3.5}>
+            </Grid2>
+          </Grid2>
+          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+            <Grid2 xs={3.5}>
               <TextField className="campoInput" margin='none' label="Cliente" variant="outlined" size="small" value={fichaDataVentas.ClienteProveedor.razonSocial} onChange={handleChangeCabVentas} />
-            </Grid>
-            <Grid item xs={2.5}>
+            </Grid2>
+            <Grid2 xs={2.5}>
               <TextField className="campoInput" margin='none' label="Forma de Pago" variant="outlined" size="small" value={fichaDataVentas.FormaPago.descripcion} onChange={handleChangeCabVentas} />
-            </Grid>
-            <Grid item xs={2}>
+            </Grid2>
+            <Grid2 xs={2}>
               <TextField className="campoInput" margin='none' label="Vendedor" variant="outlined" size="small" value={fichaDataVentas.idVendedor} onChange={handleChangeCabVentas} />
-            </Grid>
-            <Grid item xs={2}>
+            </Grid2>
+            <Grid2 xs={2}>
               <TextField className="campoInput" margin='none' label="Tecnico" variant="outlined" size="small" value={fichaDataVentas.idTecnico} onChange={handleChangeCabVentas} />
-            </Grid>
-            <Grid item xs={2}>
+            </Grid2>
+            <Grid2 xs={2}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -389,8 +390,8 @@ const handleChangeDesc = (event, name)=>{
                 customInput={TextField }
                 onValueChange={handleChangeCabVentas}
               />
-            </Grid>
-          </Grid>
+            </Grid2>
+          </Grid2>
           <div className='container-detdatagrid'>
                 <div className='detdata-datagrid'>
                     <DataGrid 
@@ -420,8 +421,8 @@ const handleChangeDesc = (event, name)=>{
                     )}
                 </div>
           </div>
-          <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid item xs={4}>
+          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+            <Grid2 xs={4}>
               {/* <TextField className="campoInput" margin='none' label="V.Venta" variant="outlined" size="small" disabled={true} InputProps={{ startAdornment: <InputAdornment position="start">{fichaDataVentas.moneda?"US$":"S/."}</InputAdornment> }} value={valorVentaTotal} onChange={handleChangeCabVentas} /> */}
               <NumericFormat
                 margin='none'
@@ -440,8 +441,8 @@ const handleChangeDesc = (event, name)=>{
                 size="small"
                 customInput={TextField }
               />
-            </Grid>
-            <Grid item xs={4}>
+            </Grid2>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -460,8 +461,8 @@ const handleChangeDesc = (event, name)=>{
                 customInput={TextField }
                 onValueChange={(values) => handleChangeDesc(values, "descuentoTotal")}
               />
-            </Grid>
-            <Grid item xs={4}>
+            </Grid2>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -480,10 +481,10 @@ const handleChangeDesc = (event, name)=>{
                 customInput={TextField }
                 onValueChange={(values) => handleChangeDesc(values, "porcentajeDescuentoTotal")}
               />
-            </Grid>
-          </Grid>
-          <Grid container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid item xs={4}>
+            </Grid2>
+          </Grid2>
+          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -501,8 +502,8 @@ const handleChangeDesc = (event, name)=>{
                 size="small"
                 customInput={TextField }
               />
-            </Grid>
-            <Grid item xs={4}>
+            </Grid2>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -520,8 +521,8 @@ const handleChangeDesc = (event, name)=>{
                 size="small"
                 customInput={TextField }
               />
-            </Grid>
-            <Grid item xs={4}>
+            </Grid2>
+            <Grid2 xs={4}>
                 <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -539,9 +540,9 @@ const handleChangeDesc = (event, name)=>{
                 size="small"
                 customInput={TextField }
               />
-            </Grid>
-          </Grid>
-        </Grid>
+            </Grid2>
+          </Grid2>
+        </Grid2>
       </DialogContent>
       <DialogActions>
         <Button variant="contained" color="error" size="small" onClick={handleCloseCabVentas}>Cancelar</Button>

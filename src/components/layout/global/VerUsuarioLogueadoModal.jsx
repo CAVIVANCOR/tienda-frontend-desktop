@@ -2,8 +2,8 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid } from '@mui/material';
-
-function VerModalUsuarioLogueado({ isOpen, onClose, usuarioLogueado, imageUsuarioLogueadoUrl }) {
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
+function VerUsuarioLogueadoModal({ isOpen, onClose, usuarioLogueado, imageUsuarioLogueadoUrl }) {
   const cellStyle = {
     padding: '8px',
     backgroundColor: '#d8c690', // Cambiar el color de fondo de las celdas aquí
@@ -19,47 +19,47 @@ function VerModalUsuarioLogueado({ isOpen, onClose, usuarioLogueado, imageUsuari
     <Dialog open={isOpen} onClose={onClose}>
       <DialogTitle sx={{ textAlign: 'center' }}>Usuario Logueado</DialogTitle>
       <DialogContent >
-        <Grid container spacing={2} justifyContent="center" alignItems="center" style={{ margin: 'auto',maxWidth: '380px' }}>
-          <Grid item xs={12} sx={{ textAlign: 'center' }}>
+        <Grid2 container spacing={2} justifyContent="center" alignItems="center" style={{ margin: 'auto',maxWidth: '380px' }}>
+          <Grid2 item xs={12} sx={{ textAlign: 'center' }}>
             <img className="foto-usuario" src={imageUsuarioLogueadoUrl} alt="Foto Usuario" style={imageStyle}/>
-          </Grid>
-          <Grid item xs={2} style={cellStyle}>
+          </Grid2>
+          <Grid2 item xs={2} style={cellStyle}>
             <strong>Nombre:</strong>
-          </Grid>
-          <Grid item xs={10} style={cellStyle}>
+          </Grid2>
+          <Grid2 item xs={10} style={cellStyle}>
             {usuarioLogueado.Personal.nombres}
-          </Grid>
-          <Grid item xs={2} style={cellStyle}>
+          </Grid2>
+          <Grid2 item xs={2} style={cellStyle}>
             <strong>Rol:</strong>
-          </Grid>
-          <Grid item xs={10} style={cellStyle}>
+          </Grid2>
+          <Grid2 item xs={10} style={cellStyle}>
             {usuarioLogueado.Rol.descripcion}
-          </Grid>
-          <Grid item xs={2} style={cellStyle}>
+          </Grid2>
+          <Grid2 item xs={2} style={cellStyle}>
             <strong>Email:</strong>
-          </Grid>
-          <Grid item xs={10} style={cellStyle}>
+          </Grid2>
+          <Grid2 item xs={10} style={cellStyle}>
             {usuarioLogueado.Personal.email}
-          </Grid>
-          <Grid item xs={4} style={cellStyle}>
+          </Grid2>
+          <Grid2 item xs={4} style={cellStyle}>
             <strong>Tipo de Documento:</strong>
-          </Grid>
-          <Grid item xs={4} style={cellStyle}>
+          </Grid2>
+          <Grid2 item xs={4} style={cellStyle}>
             {`${usuarioLogueado.Personal.TipoDocIdentidad.iniciales}`}
-          </Grid>
-          <Grid item xs={4} style={cellStyle}>
+          </Grid2>
+          <Grid2 item xs={4} style={cellStyle}>
             {`${usuarioLogueado.Personal.nroDocIdentidad}`}
-          </Grid>
-          <Grid item xs={4} style={cellStyle}>
+          </Grid2>
+          <Grid2 item xs={4} style={cellStyle}>
             <strong>Almacen Asignado:</strong>
-          </Grid>
-          <Grid item xs={1} style={cellStyle}>
+          </Grid2>
+          <Grid2 item xs={1} style={cellStyle}>
             {`${usuarioLogueado.AlmacenId}`}
-          </Grid>
-          <Grid item xs={7} style={cellStyle}>
+          </Grid2>
+          <Grid2 item xs={7} style={cellStyle}>
             {`${usuarioLogueado.Almacen.descripcion}`}
-          </Grid>
-        </Grid>
+          </Grid2>
+        </Grid2>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancelar</Button>
@@ -67,5 +67,4 @@ function VerModalUsuarioLogueado({ isOpen, onClose, usuarioLogueado, imageUsuari
     </Dialog>
   );
 }
-
-export default VerModalUsuarioLogueado;
+export default VerUsuarioLogueadoModal;

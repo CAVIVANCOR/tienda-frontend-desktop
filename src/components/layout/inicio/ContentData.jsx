@@ -1,16 +1,14 @@
 /* eslint-disable no-unused-vars */
-
 import React from 'react';
-import './ContentData.css';
 import SearchResultsList from '../global/SearchResultsList';
 import { useSelector } from 'react-redux';
+import { Box } from '@mui/material';
 function ContentData () {
   const results = useSelector((state) => state.inicio.results);
   return (
-    <div className='content-data'>
-      {results && results.length > 0 && <SearchResultsList />}
-    </div>
-    )
+    <Box sx={{ flexGrow: 1 }}>
+      {results.length > 0 && <SearchResultsList />}
+    </Box>
+  )
 }
-
 export default ContentData;
