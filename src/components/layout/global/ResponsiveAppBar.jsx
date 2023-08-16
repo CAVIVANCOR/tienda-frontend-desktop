@@ -77,7 +77,7 @@ function ResponsiveAppBar() {
     setMostrarVentanaModal(false);
   };
   return (
-      <AppBar position="sticky" sx={{ backgroundColor: '#A9A9A9', borderRadius: '1.5rem' }}>
+      <AppBar position="sticky" sx={{ backgroundColor: '#A9A9A9', borderRadius: '0.5rem' }}>
         <Container maxWidth="lg">
           <Toolbar disableGutters>
             {/* Inicio: Menu para Pantallas Pequeñas: Tablets y Celulares */}

@@ -89,7 +89,7 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
       <DialogTitle className='dialogTitleDetVentas'>Ficha Detalle de Venta</DialogTitle>
       <DialogContent className='dialogContentDetVentas'>
         <Grid2 container spacing={2} justifyContent="center" alignItems="center" style={{margin: 'auto'}}>
-          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+          <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
             <Grid2 xs={12}>
               <Card className='cardDetVentas'>
                 <CardHeader align="center" title={fichaDataDetVentas.Producto.descripcion} subheader={"ID:"+fichaDataDetVentas.ProductoId}/>
@@ -98,7 +98,7 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                   <Typography sx={{marginBottom:2, marginTop:0, borderColor: 'primary.main'}}gutterBottom align="center" variant="subtitle1" color="textSecondary" component="h6">
                     Cod.Prov.: {fichaDataDetVentas.Producto.codigoProveedor}  Modelo: {fichaDataDetVentas.modeloFabricante}
                   </Typography>
-                  <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+                  <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
                     <Grid2 xs={4}>
                       <NumericFormat
                         margin='none'
@@ -144,7 +144,7 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
               </Card>
             </Grid2>           
           </Grid2>
-          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+          <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
             <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
@@ -206,7 +206,7 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
               />
             </Grid2>
           </Grid2>
-          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+          <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
             <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
@@ -268,7 +268,7 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
               />
             </Grid2>
           </Grid2>
-          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+          <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
             <Grid2 xs={4}>
               <NumericFormat
                 margin='none'

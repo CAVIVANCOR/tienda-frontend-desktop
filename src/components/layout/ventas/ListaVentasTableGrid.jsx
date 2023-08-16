@@ -1,12 +1,13 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { DataGrid } from '@mui/x-data-grid';
-import { IconButton } from '@mui/material';
+import { DataGrid, GridRowModes, GridToolbarContainer } from '@mui/x-data-grid';
+import { Box, Button, IconButton, Stack } from '@mui/material';
 import { Edit, Delete, Visibility } from '@mui/icons-material';
-import './ListaVentasTableGrid.css';
 import FichaVentasModal from './FichaVentasModal';
 import { setResults } from '../../../redux/features/task/inicio';
+import AddIcon from '@mui/icons-material/Add';
 
 function ListaVentasTableGrid() {
     const results = useSelector((state) => state.inicio.results);
@@ -36,28 +37,36 @@ function ListaVentasTableGrid() {
             });
         let columns = Object.keys(dataPreparada[0]).map((key) => {
             let anchoColumna = 0;
+            let anchoMinimo = 0;
             switch (key) {
                 case 'id':
-                    anchoColumna = 120; 
+                    anchoMinimo= 90;
+                    anchoColumna = 0.5; 
                     break;
                 case 'serie':
-                    anchoColumna = 120; 
+                    anchoMinimo= 90;
+                    anchoColumna = 0.5;
                     break;
                 case 'num':
-                    anchoColumna = 120; 
+                    anchoMinimo= 90;
+                    anchoColumna = 0.5;
                     break;
                 case 'fecha':
-                    anchoColumna = 120; 
+                    anchoMinimo= 100;
+                    anchoColumna = 0.5;
                     break;
                 case 'cliente':
-                    anchoColumna = 250; 
+                    anchoMinimo= 90;
+                    anchoColumna = 2;
                     break;
                 case 'pvtotal':
-                    anchoColumna = 120; 
-                    return {
+                    anchoMinimo= 90;
+                    anchoColumna = 0.5; 
+                return {
                         field: key,
                         headerName: key,
-                        width: anchoColumna,
+                        minWidth: anchoMinimo,
+                        flex:anchoColumna,
                         editable: false,
                         valueFormatter: (params) => `${params.value}`,
                         align: 'right',
@@ -68,7 +77,8 @@ function ListaVentasTableGrid() {
             return {
                 field: key,
                 headerName: key,
-                width: anchoColumna,
+                minWidth: anchoMinimo,
+                flex:anchoColumna,
                 editable: false,
                 align: 'center',
                 headerAlign: 'center',
@@ -77,8 +87,12 @@ function ListaVentasTableGrid() {
 
         columns.push({
             field: 'actions',
-            headerName: 'Actions',
-            width: 150,
+            type: 'actions',
+            headerName: 'Acciones',
+            cellClassName: 'actions',
+            minWidth: 140,
+            flex: 0.5,
+            align: 'left',
             renderCell: (params) => (
                 <>
                     <IconButton onClick={() => handleEdit(params.row)}>
@@ -125,36 +139,54 @@ function ListaVentasTableGrid() {
     const handleSelectionChange = (newSelection) => {
         setSelectedRows(newSelection);
     };
-    //console.log("tableData:", tableData,"tableColumns:", tableColumns);
+    function EditToolbar(props) {
+        const { setTableData, setFichaDataVentas } = props;
+        const handleClick = () => {
+            const id = Math.floor(Math.random() * 10000);
+            setTableData((oldRows) => [...oldRows, { id, name: '', age: '', isNew: true }]);
+            setFichaDataVentas((oldModel) => ({
+            ...oldModel,
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
+        }));
+        };
+        return (
+        <GridToolbarContainer>
+            <Button sx={{ m: 1 }} variant="contained" color="success" startIcon={<AddIcon />} onClick={handleClick}>Nueva Venta</Button>
+        </GridToolbarContainer>
+        );
+    }
     return (
-            <div className='container-datagrid'>
-                <div className='data-datagrid'>
-                    <DataGrid 
-                        className='data-ventas' 
-                        rows={tableData} 
-                        columns={tableColumns}
-                        initialState={{
-                            pagination: {
-                            paginationModel: { page: 0, pageSize: 10 },
-                            },
-                        }}
-                        pageSizeOptions={[10, 20,30,40,50]}
-                        // checkboxSelection
-                        density='compact'
-                        rowSelectionModel={selectedRows}
-                        onRowSelectionModelChange={handleSelectionChange}
+            <Box ml={1} sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: '100%', height: '100%'}}>
+                <DataGrid 
+                    rows={tableData} 
+                    columns={tableColumns}
+                    sx={{ width: '100%', height: '100%', backgroundColor: 'white', boxShadow:5, borderRadius: 2, border:3, borderColor:'primary.main', "& .MuiDataGrid-columnHeaders": { backgroundColor: 'primary.main', color: 'white' } }}
+                    density='compact'
+                    rowSelectionModel={selectedRows}
+                    onRowSelectionModelChange={handleSelectionChange}
+                    initialState={{
+                        pagination: {
+                        paginationModel: { page: 0, pageSize: 10 },
+                        },
+                    }}
+                    pageSizeOptions={[10, 20,30,40,50]}
+                    slots={{
+                        toolbar: EditToolbar,
+                    }}
+                    slotProps={{
+                        toolbar: { setTableData, setFichaDataVentas  },
+                    }}
+                />
+                {isEditModalOpen && (
+                    <FichaVentasModal 
+                        isOpen={isEditModalOpen}
+                        onClose={() => closeEditModal()}
+                        setSelectedRows={setSelectedRows}
+                        fichaDataVentas={fichaDataVentas}
+                        setFichaDataVentas={setFichaDataVentas}
                     />
-                    {isEditModalOpen && (
-                        <FichaVentasModal 
-                            isOpen={isEditModalOpen}
-                            onClose={() => closeEditModal()}
-                            setSelectedRows={setSelectedRows}
-                            fichaDataVentas={fichaDataVentas}
-                            setFichaDataVentas={setFichaDataVentas}
-                        />
-                    )}
-                </div>
-            </div>
+                )}
+            </Box>
     )
 }
 export default ListaVentasTableGrid;

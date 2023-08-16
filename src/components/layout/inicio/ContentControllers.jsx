@@ -6,6 +6,7 @@ import { setInputSearch, setInputCodigoBarras, setResults, inicializarInicio } f
 import { useDispatch, useSelector } from 'react-redux';
 import { Box } from '@mui/material';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
+import { WidthFull } from '@mui/icons-material';
 
 function ContentControllers() {
   const inicioInputSearch = useSelector((state) => state.inicio.inputSearch);
@@ -44,16 +45,18 @@ function ContentControllers() {
   };
 console.log("Entro a ContentControllers");
   return (
-    <Box ml={2} mr={2} mt={1} sx={{ flexGrow: 1 }}>
-      <Grid2 container spacing={2}>
-        <Grid2 xs={6}>
-          <SearchBar placeholder="Cod.Barras" setInput={setInputCodigoBarras}/>
+    <Box ml={2} mr={2} mt={1} sx={{ flexGrow: 0, mx:1,width:"100%"}} >
+      <Grid2 container xs={12} sm={12} md={12} lg={12} xl={12} sx={{ width:"100%" }}>
+        <Grid2 xs={12} sm={6} md={6} lg={6} xl={6}>
+        <SearchBar placeholder="Cod.Barras" setInput={setInputCodigoBarras}/>
         </Grid2>
-        <Grid2 xs={6}>
-          <SearchBar placeholder="Descripción" setInput={setInputSearch}/>
+        <Grid2 xs={12} sm={6} md={6} lg={6} xl={6}>
+        <SearchBar placeholder="Descripción" setInput={setInputSearch}/>
         </Grid2>
       </Grid2>
     </Box>
   )
 }
 export default ContentControllers
+
+{/* <Grid2 xs={1} sm={1} md={1} lg={1} xl={1} key={id}> */}

@@ -20,43 +20,43 @@ function VerUsuarioLogueadoModal({ isOpen, onClose, usuarioLogueado, imageUsuari
       <DialogTitle sx={{ textAlign: 'center' }}>Usuario Logueado</DialogTitle>
       <DialogContent >
         <Grid2 container spacing={2} justifyContent="center" alignItems="center" style={{ margin: 'auto',maxWidth: '380px' }}>
-          <Grid2 item xs={12} sx={{ textAlign: 'center' }}>
+          <Grid2 xs={12} sx={{ textAlign: 'center' }}>
             <img className="foto-usuario" src={imageUsuarioLogueadoUrl} alt="Foto Usuario" style={imageStyle}/>
           </Grid2>
-          <Grid2 item xs={2} style={cellStyle}>
+          <Grid2 xs={2} style={cellStyle}>
             <strong>Nombre:</strong>
           </Grid2>
-          <Grid2 item xs={10} style={cellStyle}>
+          <Grid2 xs={10} style={cellStyle}>
             {usuarioLogueado.Personal.nombres}
           </Grid2>
-          <Grid2 item xs={2} style={cellStyle}>
+          <Grid2 xs={2} style={cellStyle}>
             <strong>Rol:</strong>
           </Grid2>
-          <Grid2 item xs={10} style={cellStyle}>
+          <Grid2 xs={10} style={cellStyle}>
             {usuarioLogueado.Rol.descripcion}
           </Grid2>
-          <Grid2 item xs={2} style={cellStyle}>
+          <Grid2 xs={2} style={cellStyle}>
             <strong>Email:</strong>
           </Grid2>
-          <Grid2 item xs={10} style={cellStyle}>
+          <Grid2 xs={10} style={cellStyle}>
             {usuarioLogueado.Personal.email}
           </Grid2>
-          <Grid2 item xs={4} style={cellStyle}>
+          <Grid2 xs={4} style={cellStyle}>
             <strong>Tipo de Documento:</strong>
           </Grid2>
-          <Grid2 item xs={4} style={cellStyle}>
+          <Grid2 xs={4} style={cellStyle}>
             {`${usuarioLogueado.Personal.TipoDocIdentidad.iniciales}`}
           </Grid2>
-          <Grid2 item xs={4} style={cellStyle}>
+          <Grid2 xs={4} style={cellStyle}>
             {`${usuarioLogueado.Personal.nroDocIdentidad}`}
           </Grid2>
-          <Grid2 item xs={4} style={cellStyle}>
+          <Grid2 xs={4} style={cellStyle}>
             <strong>Almacen Asignado:</strong>
           </Grid2>
-          <Grid2 item xs={1} style={cellStyle}>
+          <Grid2 xs={1} style={cellStyle}>
             {`${usuarioLogueado.AlmacenId}`}
           </Grid2>
-          <Grid2 item xs={7} style={cellStyle}>
+          <Grid2 xs={7} style={cellStyle}>
             {`${usuarioLogueado.Almacen.descripcion}`}
           </Grid2>
         </Grid2>

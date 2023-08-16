@@ -1,29 +1,28 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect } from 'react'
-import './ContentControllers.css';
 import SearchBar from '../../layout/global/SearchBar';
-import imagenLimpieza from '../../../icons/limpieza.png';
 import axios from "axios";
 import { setInputSearch, setResults, inicializarInicio } from '../../../redux/features/task/inicio';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import 'moment/locale/es'; // Importa el idioma si lo necesitas
+import { Box } from '@mui/material';
 function ContentControllers() {
   const inicioInputSearch = useSelector((state) => state.inicio.inputSearch);
   const dispatch = useDispatch();
   moment.locale('es'); // Configura Moment.js para utilizar el idioma en español
-
   useEffect(() => {
-    if (inicioInputSearch!=="") buscarVentas({razonSocial:inicioInputSearch});
+    if (inicioInputSearch!=="") {
+      buscarVentas({razonSocial:inicioInputSearch});
+    }else{
+      handleCleanClick();
+    }
   }, [inicioInputSearch]);
   const buscarVentas = async (buscar) => {
-    let response =[];
       try {
-          if (buscar!=="") {
-           // console.log("Entro a BuscarVentas",buscar)
-              response = await axios.post("http://localhost:3001/cabVentas/search", buscar);
+              let response = await axios.post("http://localhost:3001/cabVentas/search", buscar);
               if (response.data.length > 0) {
-                const resultsWithDate = response.data.map(item => {
+                  let resultsWithDate = response.data.map(item => {
                   let formattedDate = moment(item.fecha).format('DD/MM/YYYY');
                   return {
                     ...item,
@@ -34,10 +33,6 @@ function ContentControllers() {
               } else {
                   console.log("Error: No se encontro ningun registro");
               }
-          }else{
-              console.log("Error: Debe enviar una descripción");
-              handleCleanClick();
-          }
       } catch (error) {
           console.log("Error: En la solicitud Backend, Servidor de Base de Datos NO Responde",error);
       }
@@ -46,17 +41,9 @@ function ContentControllers() {
     dispatch(inicializarInicio());
   };
   return (
-    <div className="search-bar">
-      <SearchBar placeholder="Razon Social" setInput={setInputSearch}/>
-      <div className='searchbar-buttons'>
-        <div>
-          <button onClick={handleCleanClick}>
-            <img src={imagenLimpieza} alt="Limpiar Barra Search" />
-          </button>
-        </div>
-      </div>
-    </div>
-  )
+    <Box ml={2} mr={2} mt={1} sx={{ flexGrow: 0, mx:1,width:"100%"}} >
+              <SearchBar placeholder="Razón Social" setInput={setInputSearch}/>
+          </Box>
+        )
 }
-
-export default ContentControllers
+export default ContentControllers;

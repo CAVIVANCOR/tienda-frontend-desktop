@@ -15,7 +15,7 @@ function Footer() {
         p: 1,
         mt: 0.5,
         mb: 0.5,
-        borderRadius: "1.5rem",
+        borderRadius: "0.5rem",
       }}>
       <Container maxWidth="lg">
         <Grid2 container spacing={5}>

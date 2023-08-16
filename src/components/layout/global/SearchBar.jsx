@@ -24,16 +24,16 @@ function SearchBar ({ placeholder,  setInput }) {
     await dispatch(setInput(""));
   }
   return (
-    <Box sx={{ flexGrow: 1, border: "2px solid grey", borderRadius: "15px", backgroundColor: "white" }}>
-      <Grid2 container xs={12} alignItems="center" spacing={0}>
+    <Box  sx={{  display:"flex", alignContent: "center", alignItems: "center", justifyContent: "center", flexDirection: "row", width:"100%", border: "2px solid grey", borderRadius: "15px", backgroundColor: "white" }}>
+      <Grid2 container sx={{width: "100%", alignItems:"center"}} xs={12}  spacing={1}>
         <Grid2 align="center" xs={1.5} >
-          <FaRegTimesCircle fontSize={"large"} id="clean-icon" onClick={handleCleanClick} />
+          <FaRegTimesCircle size={"1.5em"} id="clean-icon" onClick={handleCleanClick} />
         </Grid2>
         <Grid2 xs={9} >
           <TextField sx={{ width: "100%", mt: 0.5, mb: 0.5 }} id="search-bar" placeholder={placeholder} value={inputLocal} size="small" onInput={handleChange}/>
         </Grid2>
         <Grid2 align="center" xs={1.5} >
-          <FaSearch id="search-icon" onClick={handleClick}/>
+          <FaSearch size={"1.5em"} id="search-icon" onClick={handleClick}/>
         </Grid2>
       </Grid2>
     </Box>

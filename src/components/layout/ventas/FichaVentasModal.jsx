@@ -322,7 +322,7 @@ const handleChangeDesc = (event, name)=>{
       <DialogTitle>{fichaDataVentas.CorrelativoDoc.TipoDocumento.descripcion} ID:{fichaDataVentas.id}</DialogTitle>
       <DialogContent style={{ maxHeight: 'calc(100vh - 300px)', overflow: 'hidden' }}>
         <Grid2 className='campoInput' container spacing={2} justifyContent="center" alignItems="center" style={{margin: 'auto'}}>
-          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+          <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
             <Grid2 xs={3}>
               <TextField  className="campoInput" margin='none' label="Serie Dcmto" variant="outlined" size="small" disabled={true} value={fichaDataVentas.serieDcmto} onChange={handleChangeCabVentas} />
             </Grid2>
@@ -358,7 +358,7 @@ const handleChangeDesc = (event, name)=>{
               </Select>
             </Grid2>
           </Grid2>
-          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+          <Grid2 container  xs={12} alignItems="center" justifyContent="center" spacing={2}>
             <Grid2 xs={3.5}>
               <TextField className="campoInput" margin='none' label="Cliente" variant="outlined" size="small" value={fichaDataVentas.ClienteProveedor.razonSocial} onChange={handleChangeCabVentas} />
             </Grid2>
@@ -421,7 +421,7 @@ const handleChangeDesc = (event, name)=>{
                     )}
                 </div>
           </div>
-          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+          <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
             <Grid2 xs={4}>
               {/* <TextField className="campoInput" margin='none' label="V.Venta" variant="outlined" size="small" disabled={true} InputProps={{ startAdornment: <InputAdornment position="start">{fichaDataVentas.moneda?"US$":"S/."}</InputAdornment> }} value={valorVentaTotal} onChange={handleChangeCabVentas} /> */}
               <NumericFormat
@@ -483,7 +483,7 @@ const handleChangeDesc = (event, name)=>{
               />
             </Grid2>
           </Grid2>
-          <Grid2 container item xs={12} alignItems="center" justifyContent="center" spacing={2}>
+          <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
             <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
