@@ -2,8 +2,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, Select, MenuItem, IconButton } from '@mui/material';
-import './FichaVentasModal.css';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button,  TextField, Select, MenuItem, IconButton, FormControl, InputLabel, Autocomplete, Snackbar } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import moment from 'moment';
@@ -12,11 +11,14 @@ import axios from 'axios';
 import {formatDateStringToyyyymmdd} from '../../../utilities/utilities';
 import { NumericFormat } from 'react-number-format';
 import { DataGrid } from '@mui/x-data-grid';
-import { Delete, Edit } from '@mui/icons-material';
+import { Delete, Edit, ExitToApp, Search } from '@mui/icons-material';
 import FichaDetVentasModal from './FichaDetVentasModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { setResults } from '../../../redux/features/task/inicio';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
+import FichaSearchCliente from './FichaSearchCliente';
+import MuiAlert from '@mui/material/Alert';
+
 function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, setFichaDataVentas }) {
   const results = useSelector((state) => state.inicio.results);
   const datosGlobales = useSelector((state) => state.datosGlobales.data);
@@ -35,6 +37,9 @@ function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, s
   const [isEditModalOpenDetVentas, setIsEditModalOpenDetVentas] = useState(false);
   const [selectedRowsDet, setSelectedRowsDet] = useState([]);
   const [fichaDataDetVentas, setFichaDataDetVentas] = useState({});
+  const [openSearchCliente, setOpenSearchCliente] = useState(false);
+  const [openMessageUser, setOpenMessageUser] = useState(false);
+
   moment.locale('es'); // Configura Moment.js para utilizar el idioma en español
   useEffect(() => {
     prepararDataDetVentas();
@@ -316,23 +321,39 @@ const handleChangeDesc = (event, name)=>{
     [name]: event.floatValue
   });
 };
+const handleCloseSearchCliente = () => {
+  setOpenSearchCliente(false);
+}
+const handleOpenSearchCliente = () => {
+  setOpenSearchCliente(true);
+}
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+const handleCloseMessageUser = (event, reason) => {
+  if (reason === 'clickaway') {
+    return;
+  }
+  setOpenMessageUser(false);
+};
 //console.log("fichaDataVentas",fichaDataVentas);
   return (
-    <Dialog className='dialogFichaVentas' open={isOpen} fullWidth maxWidth="md">
+    <Dialog open={isOpen} fullWidth maxWidth="xl">
       <DialogTitle>{fichaDataVentas.CorrelativoDoc.TipoDocumento.descripcion} ID:{fichaDataVentas.id}</DialogTitle>
-      <DialogContent style={{ maxHeight: 'calc(100vh - 300px)', overflow: 'hidden' }}>
-        <Grid2 className='campoInput' container spacing={2} justifyContent="center" alignItems="center" style={{margin: 'auto'}}>
-          <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid2 xs={3}>
-              <TextField  className="campoInput" margin='none' label="Serie Dcmto" variant="outlined" size="small" disabled={true} value={fichaDataVentas.serieDcmto} onChange={handleChangeCabVentas} />
+      <DialogContent>
+        <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:0.5,mb:0.5}}>
+            <Grid2 xs={4}>
+              <TextField fullWidth className="campoInput" margin='none' label="Serie Dcmto" variant="outlined" size="small" disabled={true} value={fichaDataVentas.serieDcmto} onChange={handleChangeCabVentas} />
             </Grid2>
-            <Grid2 xs={3}>
-              <TextField className="campoInput" margin='none' label="N° Correlativo" variant="outlined" size="small" disabled={true} value={fichaDataVentas.correlativoDcmto} onChange={handleChangeCabVentas} />
+            <Grid2 xs={4}>
+              <TextField fullWidth className="campoInput" margin='none' label="N° Correlativo" variant="outlined" size="small" disabled={true} value={fichaDataVentas.correlativoDcmto} onChange={handleChangeCabVentas} />
             </Grid2>
-            <Grid2 xs={3}>
+            <Grid2 xs={4}>
               <DatePicker className="campoInput" label="Fecha" format="DD/MM/YYYY" formatDensity='dense' size="small" value={dayjs(formatDateStringToyyyymmdd(fichaDataVentas.fecha))} onChange={(newValue) => handleChangefecha(newValue)} />
             </Grid2>
-            <Grid2 xs={1.5}>
+        </Grid2>
+        <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:0.5,mb:0.5}}>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -348,30 +369,19 @@ const handleChangeDesc = (event, name)=>{
                 suffix=''
                 className="campoInput"
                 size="small"
-                customInput={TextField }
+                customInput={TextField}
               />
             </Grid2>
-            <Grid2 xs={1.5}>
-              <Select labelId="moneda" name="moneda" id="moneda" value={fichaDataVentas.moneda} label="Moneda" size="small" onChange={handleChangeBoolean}>
-                <MenuItem value={true}>{datosGlobales.descripCortaME}</MenuItem>
-                <MenuItem value={false}>{datosGlobales.descripCortaMN}</MenuItem>
-              </Select>
+            <Grid2 xs={4}>
+              <FormControl fullWidth>
+                <InputLabel id="moneda">Moneda</InputLabel>
+                <Select labelId="moneda" name="moneda" id="moneda" value={fichaDataVentas.moneda} label="Moneda" size="small" onChange={handleChangeBoolean}>
+                  <MenuItem value={true}>{datosGlobales.descripCortaME}</MenuItem>
+                  <MenuItem value={false}>{datosGlobales.descripCortaMN}</MenuItem>
+                </Select>
+              </FormControl>
             </Grid2>
-          </Grid2>
-          <Grid2 container  xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid2 xs={3.5}>
-              <TextField className="campoInput" margin='none' label="Cliente" variant="outlined" size="small" value={fichaDataVentas.ClienteProveedor.razonSocial} onChange={handleChangeCabVentas} />
-            </Grid2>
-            <Grid2 xs={2.5}>
-              <TextField className="campoInput" margin='none' label="Forma de Pago" variant="outlined" size="small" value={fichaDataVentas.FormaPago.descripcion} onChange={handleChangeCabVentas} />
-            </Grid2>
-            <Grid2 xs={2}>
-              <TextField className="campoInput" margin='none' label="Vendedor" variant="outlined" size="small" value={fichaDataVentas.idVendedor} onChange={handleChangeCabVentas} />
-            </Grid2>
-            <Grid2 xs={2}>
-              <TextField className="campoInput" margin='none' label="Tecnico" variant="outlined" size="small" value={fichaDataVentas.idTecnico} onChange={handleChangeCabVentas} />
-            </Grid2>
-            <Grid2 xs={2}>
+            <Grid2 xs={4}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
@@ -391,156 +401,188 @@ const handleChangeDesc = (event, name)=>{
                 onValueChange={handleChangeCabVentas}
               />
             </Grid2>
+        </Grid2>
+        <Grid2 container  xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:0.5,mb:0.5}}>
+          <Grid2 xs={5.5}>
+            <TextField fullWidth className="campoInput" margin='none' label="Cliente" variant="outlined" size="small" value={fichaDataVentas.ClienteProveedor.razonSocial} />
           </Grid2>
-          <div className='container-detdatagrid'>
-                <div className='detdata-datagrid'>
-                    <DataGrid 
-                        className='data-detventas' 
-                        rows={detTableData} 
-                        columns={detTableColumns}
-                        initialState={{
-                            pagination: {
-                            paginationModel: { page: 0, pageSize: 4 },
-                            },
-                        }}
-                        pageSizeOptions={[4,8,12,16,20]}
-                        // checkboxSelection
-                        density='compact'
-                        rowSelectionModel={selectedRowsDet}
-                        onRowSelectionModelChange={handleSelectionChangeDetVentas}
-                    />
-                    {isEditModalOpenDetVentas && (
-                        <FichaDetVentasModal 
-                            isOpen={isEditModalOpenDetVentas}
-                            onClose={() => closeEditModalDetVentas()}
-                            setSelectedRowsDet={setSelectedRowsDet}
-                            fichaDataDetVentas={fichaDataDetVentas}
-                            setFichaDataDetVentas={setFichaDataDetVentas}
-                            fichaDataVentas={fichaDataVentas}
-                        />
-                    )}
-                </div>
-          </div>
-          <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid2 xs={4}>
-              {/* <TextField className="campoInput" margin='none' label="V.Venta" variant="outlined" size="small" disabled={true} InputProps={{ startAdornment: <InputAdornment position="start">{fichaDataVentas.moneda?"US$":"S/."}</InputAdornment> }} value={valorVentaTotal} onChange={handleChangeCabVentas} /> */}
-              <NumericFormat
-                margin='none'
-                variant='outlined'
-                disabled={true}
-                label="V.Venta"
-                value={totalesCabVentas.valorVentaTotal}
-                name='valorVentaTotal'
-                thousandSeparator=","
-                decimalSeparator="."
-                decimalScale={2}
-                fixedDecimalScale
-                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
-                suffix=''
-                className="campoInput"
-                size="small"
-                customInput={TextField }
-              />
-            </Grid2>
-            <Grid2 xs={4}>
-              <NumericFormat
-                margin='none'
-                variant='outlined'
-                disabled={false}
-                label="Descuento"
-                value={totalesCabVentas.descuentoTotal}
-                name='descuentoTotal'
-                thousandSeparator=","
-                decimalSeparator="."
-                decimalScale={2}
-                fixedDecimalScale
-                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
-                suffix=''
-                className="campoInput"
-                size="small"
-                customInput={TextField }
-                onValueChange={(values) => handleChangeDesc(values, "descuentoTotal")}
-              />
-            </Grid2>
-            <Grid2 xs={4}>
-              <NumericFormat
-                margin='none'
-                variant='outlined'
-                disabled={false}
-                label="% Desc."
-                value={totalesCabVentas.porcentajeDescuentoTotal}
-                name='porcentajeDescuentoTotal'
-                thousandSeparator=","
-                decimalSeparator="."
-                decimalScale={2}
-                fixedDecimalScale
-                prefix={""}
-                suffix='%'
-                className="campoInput"
-                size="small"
-                customInput={TextField }
-                onValueChange={(values) => handleChangeDesc(values, "porcentajeDescuentoTotal")}
-              />
-            </Grid2>
+          <Grid2 xs={1.5}>
+            <Button variant="contained" size="large" color="success" startIcon={<Search />} onClick={handleOpenSearchCliente}/>
           </Grid2>
-          <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid2 xs={4}>
+          {openSearchCliente && (
+            <FichaSearchCliente 
+              isOpen={openSearchCliente} 
+              onClose={handleCloseSearchCliente} 
+              fichaDataVentas={fichaDataVentas} 
+              setFichaDataVentas={setFichaDataVentas}
+              setOpenMessageUser={setOpenMessageUser}/>
+          )}
+          {openMessageUser && (
+            <Snackbar open={openMessageUser} autoHideDuration={6000} onClose={handleCloseMessageUser}>
+              <Alert onClose={handleCloseMessageUser} severity="success" sx={{ width: '100%' }}>
+                Actualizando Datos del Cliente, no olvide GUARDAR los cambios
+              </Alert>
+            </Snackbar>
+          )}
+                      
+          <Grid2 xs={4}>
+            <TextField fullWidth className="campoInput" margin='none' label="Forma de Pago" variant="outlined" size="small" value={fichaDataVentas.FormaPago.descripcion} onChange={handleChangeCabVentas} />
+          </Grid2>
+          <Grid2 xs={1}>
+            <Button variant="contained" size="large" color="success" startIcon={<Search />} onClick={handleChangeCabVentas}/>
+          </Grid2>
+        </Grid2>
+        <Grid2 container  xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:0.5,mb:0.5}}>
+            <Grid2 xs={7}>
+              <TextField fullWidth className="campoInput" margin='none' label="Vendedor" variant="outlined" size="small" value={fichaDataVentas.idVendedor} onChange={handleChangeCabVentas} />
+            </Grid2>
+            <Grid2 xs={5}>
+              <TextField fullWidth className="campoInput" margin='none' label="Tecnico" variant="outlined" size="small" value={fichaDataVentas.idTecnico} onChange={handleChangeCabVentas} />
+            </Grid2>
+        </Grid2>
+        <DataGrid 
+            rows={detTableData} 
+            columns={detTableColumns}
+            sx={{ width: '100%', height: '100%', backgroundColor: 'white', boxShadow:5, borderRadius: 2, border:3, borderColor:'primary.main', "& .MuiDataGrid-columnHeaders": { backgroundColor: 'primary.main', color: 'white' } }}
+            density='compact'
+            initialState={{
+              pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+              },
+          }}
+          pageSizeOptions={[10, 20,30,40,50]}
+            rowSelectionModel={selectedRowsDet}
+            onRowSelectionModelChange={handleSelectionChangeDetVentas}
+        />
+        {isEditModalOpenDetVentas && (
+            <FichaDetVentasModal 
+                isOpen={isEditModalOpenDetVentas}
+                onClose={() => closeEditModalDetVentas()}
+                setSelectedRowsDet={setSelectedRowsDet}
+                fichaDataDetVentas={fichaDataDetVentas}
+                setFichaDataDetVentas={setFichaDataDetVentas}
+                fichaDataVentas={fichaDataVentas}
+            />
+        )}
+        <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:1.5}}>
+          <Grid2 xs={4}>
+            {/* <TextField className="campoInput" margin='none' label="V.Venta" variant="outlined" size="small" disabled={true} InputProps={{ startAdornment: <InputAdornment position="start">{fichaDataVentas.moneda?"US$":"S/."}</InputAdornment> }} value={valorVentaTotal} onChange={handleChangeCabVentas} /> */}
+            <NumericFormat
+              margin='none'
+              variant='outlined'
+              disabled={true}
+              label="V.Venta"
+              value={totalesCabVentas.valorVentaTotal}
+              name='valorVentaTotal'
+              thousandSeparator=","
+              decimalSeparator="."
+              decimalScale={2}
+              fixedDecimalScale
+              prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+              suffix=''
+              className="campoInput"
+              size="small"
+              customInput={TextField }
+            />
+          </Grid2>
+          <Grid2 xs={4}>
+            <NumericFormat
+              margin='none'
+              variant='outlined'
+              disabled={false}
+              label="Descuento"
+              value={totalesCabVentas.descuentoTotal}
+              name='descuentoTotal'
+              thousandSeparator=","
+              decimalSeparator="."
+              decimalScale={2}
+              fixedDecimalScale
+              prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+              suffix=''
+              className="campoInput"
+              size="small"
+              customInput={TextField }
+              onValueChange={(values) => handleChangeDesc(values, "descuentoTotal")}
+            />
+          </Grid2>
+          <Grid2 xs={4}>
+            <NumericFormat
+              margin='none'
+              variant='outlined'
+              disabled={false}
+              label="% Desc."
+              value={totalesCabVentas.porcentajeDescuentoTotal}
+              name='porcentajeDescuentoTotal'
+              thousandSeparator=","
+              decimalSeparator="."
+              decimalScale={2}
+              fixedDecimalScale
+              prefix={""}
+              suffix='%'
+              className="campoInput"
+              size="small"
+              customInput={TextField }
+              onValueChange={(values) => handleChangeDesc(values, "porcentajeDescuentoTotal")}
+            />
+          </Grid2>
+        </Grid2>
+        <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:1}}>
+          <Grid2 xs={4}>
+            <NumericFormat
+              margin='none'
+              variant='outlined'
+              disabled={true}
+              label="V.V.Neto"
+              value={totalesCabVentas.valorVentaNetoTotal}
+              name='valorVentaNetoTotal'
+              thousandSeparator=","
+              decimalSeparator="."
+              decimalScale={2}
+              fixedDecimalScale
+              prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+              suffix=''
+              className="campoInput"
+              size="small"
+              customInput={TextField }
+            />
+          </Grid2>
+          <Grid2 xs={4}>
+            <NumericFormat
+              margin='none'
+              variant='outlined'
+              disabled={true}
+              label="IGV"
+              value={totalesCabVentas.igvTotal}
+              name='igvTotal'
+              thousandSeparator=","
+              decimalSeparator="."
+              decimalScale={2}
+              fixedDecimalScale
+              prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+              suffix=''
+              className="campoInput"
+              size="small"
+              customInput={TextField }
+            />
+          </Grid2>
+          <Grid2 xs={4}>
               <NumericFormat
-                margin='none'
-                variant='outlined'
-                disabled={true}
-                label="V.V.Neto"
-                value={totalesCabVentas.valorVentaNetoTotal}
-                name='valorVentaNetoTotal'
-                thousandSeparator=","
-                decimalSeparator="."
-                decimalScale={2}
-                fixedDecimalScale
-                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
-                suffix=''
-                className="campoInput"
-                size="small"
-                customInput={TextField }
-              />
-            </Grid2>
-            <Grid2 xs={4}>
-              <NumericFormat
-                margin='none'
-                variant='outlined'
-                disabled={true}
-                label="IGV"
-                value={totalesCabVentas.igvTotal}
-                name='igvTotal'
-                thousandSeparator=","
-                decimalSeparator="."
-                decimalScale={2}
-                fixedDecimalScale
-                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
-                suffix=''
-                className="campoInput"
-                size="small"
-                customInput={TextField }
-              />
-            </Grid2>
-            <Grid2 xs={4}>
-                <NumericFormat
-                margin='none'
-                variant='outlined'
-                disabled={true}
-                label="P.V.Total"
-                value={totalesCabVentas.precioVentaTotal}
-                name='precioVentaTotal'
-                thousandSeparator=","
-                decimalSeparator="."
-                decimalScale={2}
-                fixedDecimalScale
-                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
-                suffix=''
-                className="campoInput"
-                size="small"
-                customInput={TextField }
-              />
-            </Grid2>
+              margin='none'
+              variant='outlined'
+              disabled={true}
+              label="P.V.Total"
+              value={totalesCabVentas.precioVentaTotal}
+              name='precioVentaTotal'
+              thousandSeparator=","
+              decimalSeparator="."
+              decimalScale={2}
+              fixedDecimalScale
+              prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+              suffix=''
+              className="campoInput"
+              size="small"
+              customInput={TextField }
+            />
           </Grid2>
         </Grid2>
       </DialogContent>

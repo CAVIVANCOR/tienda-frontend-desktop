@@ -2,15 +2,15 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, CardMedia, Card, CardContent, Typography, CardHeader } from '@mui/material';
-import './FichaDetVentasModal.css';
 import 'moment/locale/es'; // Importa el idioma si lo necesitas
 import axios from 'axios';
 import { NumericFormat } from 'react-number-format';
 import { useSelector } from 'react-redux';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
+import {detectarDispositivo} from '../../../utilities/utilities';
+
 function FichaDetVentasModal({ isOpen, onClose, setSelectedRowsDet, fichaDataDetVentas, setFichaDataDetVentas, fichaDataVentas }) {
   const datosGlobales = useSelector((state) => state.datosGlobales.data);
-
   const handleChange = (event) => {
     setFichaDataDetVentas({
         ...fichaDataDetVentas,
@@ -75,74 +75,71 @@ function FichaDetVentasModal({ isOpen, onClose, setSelectedRowsDet, fichaDataDet
   };
 //console.log("fichaDataVentas:", fichaDataVentas, fichaDataVentas.fecha,typeof fichaDataVentas.fecha);
 const handleChangeDesc = (event, name)=>{
-  console.log("handleChangeDesc",event.floatValue,name)
   setFichaDataDetVentas({
     ...fichaDataDetVentas,
     [name]: event.floatValue
   });
 };
-//console.log("fichaDataDetVentas",fichaDataDetVentas,fichaDataDetVentas.Producto.urlFotoProducto);
+console.log("fichaDataDetVentas",fichaDataDetVentas,fichaDataDetVentas.Producto.urlFotoProducto, detectarDispositivo(), detectarDispositivo()==='Celular' ? 'column' : 'row');
 const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoProducto}`;
 
   return (
-    <Dialog className='dialogDetVentas' open={isOpen} fullWidth maxWidth="md">
-      <DialogTitle className='dialogTitleDetVentas'>Ficha Detalle de Venta</DialogTitle>
-      <DialogContent className='dialogContentDetVentas'>
-        <Grid2 container spacing={2} justifyContent="center" alignItems="center" style={{margin: 'auto'}}>
+    <Dialog open={isOpen} fullWidth maxWidth="md">
+      <DialogTitle>Ficha Detalle Venta ID:{fichaDataDetVentas.id}</DialogTitle>
+      <DialogContent>
+        <Card>
+          <Typography sx={{ borderColor: 'primary.main', color: 'primary.main'}} gutterBottom align="center" variant="h6">
+            {fichaDataDetVentas.Producto.descripcion}
+          </Typography>
+          <CardMedia component="img" src={imgProducto} sx={{maxHeight: 280, minHeight: 100, borderRadius: 10, padding: 1, alignItems:'center', justifyContent:'center'}} title={fichaDataDetVentas.Producto.descripcion} />
+          <CardContent sx={{mb: -3, alignItems: 'center', justifyContent: 'center', display: 'flex', flexDirection: detectarDispositivo()==='Celular' ? 'column' : 'row'}}>
+            <TextField id='idProd' label='ID Producto' variant="outlined" value={fichaDataDetVentas.ProductoId} size='small' disabled sx={{marginBottom: 1}} />
+            <TextField id='CodProveedorProd' label='Cod. Proveedor' variant="outlined" value={fichaDataDetVentas.Producto.codigoProveedor!==""?fichaDataDetVentas.Producto.codigoProveedor:'S/C'} size='small' disabled sx={{marginBottom: 1}} />
+            <TextField id='ModeloProd' label='Modelo Prod.' variant="outlined" defaultValue={fichaDataDetVentas.Producto.modeloFabricante!==""?fichaDataDetVentas.Producto.modeloFabricante:'S/M'} size='small' disabled sx={{marginBottom: 1}} />
+          </CardContent>
+        </Card>
+        <Grid2 container spacing={2} justifyContent="center" alignItems="center" mt={1}>
           <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid2 xs={12}>
-              <Card className='cardDetVentas'>
-                <CardHeader align="center" title={fichaDataDetVentas.Producto.descripcion} subheader={"ID:"+fichaDataDetVentas.ProductoId}/>
-                <CardMedia className='cardMediaDetVentas' component="img" src={imgProducto} title={fichaDataDetVentas.Producto.descripcion} />
-                <CardContent className='cardContentDetVentas'>
-                  <Typography sx={{marginBottom:2, marginTop:0, borderColor: 'primary.main'}}gutterBottom align="center" variant="subtitle1" color="textSecondary" component="h6">
-                    Cod.Prov.: {fichaDataDetVentas.Producto.codigoProveedor}  Modelo: {fichaDataDetVentas.modeloFabricante}
-                  </Typography>
-                  <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
-                    <Grid2 xs={4}>
-                      <NumericFormat
-                        margin='none'
-                        variant='outlined'
-                        disabled={false}
-                        label="Cantidad"
-                        value={fichaDataDetVentas.cantidad}
-                        name='cantidad'
-                        thousandSeparator=","
-                        decimalSeparator="."
-                        decimalScale={2}
-                        fixedDecimalScale
-                        prefix={""}
-                        suffix=''
-                        className="campoInput"
-                        size="small"
-                        customInput={TextField }
-                        onValueChange={handleChange}
-                      />
-                    </Grid2>
-                    <Grid2 xs={4}>
-                      <NumericFormat
-                        margin='none'
-                        variant='outlined'
-                        disabled={false}
-                        label="P.V.Unit."
-                        value={fichaDataVentas.moneda?fichaDataDetVentas.pvUnitME:fichaDataDetVentas.pvUnitMN}
-                        name='pvunit'
-                        thousandSeparator=","
-                        decimalSeparator="."
-                        decimalScale={2}
-                        fixedDecimalScale
-                        prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
-                        suffix=''
-                        className="campoInput"
-                        size="small"
-                        customInput={TextField }
-                        onValueChange={handleChange}
-                      />
-                    </Grid2>
-                  </Grid2>
-                </CardContent>
-              </Card>
-            </Grid2>           
+            <Grid2 xs={4}>
+              <NumericFormat
+                margin='none'
+                variant='outlined'
+                disabled={false}
+                label="Cantidad"
+                value={fichaDataDetVentas.cantidad}
+                name='cantidad'
+                thousandSeparator=","
+                decimalSeparator="."
+                decimalScale={2}
+                fixedDecimalScale
+                prefix={""}
+                suffix=''
+                className="campoInput"
+                size="small"
+                customInput={TextField }
+                onValueChange={handleChange}
+              />
+            </Grid2>
+            <Grid2 xs={4}>
+              <NumericFormat
+                margin='none'
+                variant='outlined'
+                disabled={false}
+                label="P.V.Unit."
+                value={fichaDataVentas.moneda?fichaDataDetVentas.pvUnitME:fichaDataDetVentas.pvUnitMN}
+                name='pvunit'
+                thousandSeparator=","
+                decimalSeparator="."
+                decimalScale={2}
+                fixedDecimalScale
+                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+                suffix=''
+                className="campoInput"
+                size="small"
+                customInput={TextField }
+                onValueChange={handleChange}
+              />
+            </Grid2>
           </Grid2>
           <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
             <Grid2 xs={4}>

@@ -69,3 +69,17 @@ export const formatDateStringToyyyymmdd = (fechaStringddmmyyyy) => {
     return fechaStringddmmyyyy.substring(6)+"-"+fechaStringddmmyyyy.substring(3,5)+"-"+fechaStringddmmyyyy.substring(0,2); 
 }
 
+export const detectarDispositivo = () => {
+    const mediaQueryDesktop = window.matchMedia('(min-width: 1024px)');
+    const mediaQueryTablet = window.matchMedia('(min-width: 768px) and (max-width: 1023px)');
+    const mediaQueryCelular = window.matchMedia('(max-width: 767px)');
+    if (mediaQueryDesktop.matches) {
+      return 'Desktop';
+    } else if (mediaQueryTablet.matches) {
+      return 'Tablet';
+    } else if (mediaQueryCelular.matches) {
+      return 'Celular';
+    } else {
+      return 'Desconocido';
+    }
+  }
