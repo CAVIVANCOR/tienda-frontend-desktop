@@ -66,20 +66,34 @@ export const eliminarEspaciosInnecesarios = (texto)=>{
 }
 
 export const formatDateStringToyyyymmdd = (fechaStringddmmyyyy) => {
-    return fechaStringddmmyyyy.substring(6)+"-"+fechaStringddmmyyyy.substring(3,5)+"-"+fechaStringddmmyyyy.substring(0,2); 
-}
+    const fechaPartes = fechaStringddmmyyyy.split("/");
+    const dia = fechaPartes[0];
+    const mes = fechaPartes[1];
+    const anio = fechaPartes[2];
+    const fechaFormateada = `${anio}/${mes}/${dia}`;
+    return fechaFormateada;
+  };
 
+export const formatDateStringToddmmyyyy = (fechaStringyyyymmdd) => {
+    const fecha = new Date(fechaStringyyyymmdd);
+    const dia = fecha.getUTCDate().toString().padStart(2, "0");
+    const mes = (fecha.getUTCMonth() + 1).toString().padStart(2, "0");
+    const anio = fecha.getUTCFullYear().toString();
+    const fechaFormateada = `${dia}/${mes}/${anio}`;
+    return fechaFormateada;
+  };
+  
 export const detectarDispositivo = () => {
     const mediaQueryDesktop = window.matchMedia('(min-width: 1024px)');
     const mediaQueryTablet = window.matchMedia('(min-width: 768px) and (max-width: 1023px)');
     const mediaQueryCelular = window.matchMedia('(max-width: 767px)');
     if (mediaQueryDesktop.matches) {
-      return 'Desktop';
+        return 'Desktop';
     } else if (mediaQueryTablet.matches) {
-      return 'Tablet';
+        return 'Tablet';
     } else if (mediaQueryCelular.matches) {
-      return 'Celular';
+        return 'Celular';
     } else {
-      return 'Desconocido';
+        return 'Desconocido';
     }
-  }
+};

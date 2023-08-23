@@ -50,7 +50,7 @@ const handleSeleccionarCliente = async (e) => {
     setOpenMessageUser(true);
     setFichaDataVentas({
       ...fichaDataVentas,
-      ClienteProveedorId: elementoEncontrado.id,
+      ClienteProveedorId: +elementoEncontrado.id,
       ClienteProveedor:regClientesEncontrados.data.find(obj => obj.id === elementoEncontrado.id)
     });
     setSearchClienteNombres("");

@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import moment from 'moment';
 import 'moment/locale/es'; // Importa el idioma si lo necesitas
 import axios from 'axios';
-import {formatDateStringToyyyymmdd} from '../../../utilities/utilities';
+import {formatDateStringToyyyymmdd, formatDateStringToddmmyyyy} from '../../../utilities/utilities';
 import { NumericFormat } from 'react-number-format';
 import { DataGrid } from '@mui/x-data-grid';
 import { Delete, Edit, ExitToApp, Search } from '@mui/icons-material';
@@ -18,9 +18,12 @@ import { setResults } from '../../../redux/features/task/inicio';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import FichaSearchCliente from './FichaSearchCliente';
 import MuiAlert from '@mui/material/Alert';
+import FichaSearchGeneral from './FichaSearchGeneral';
 
 function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, setFichaDataVentas }) {
   const results = useSelector((state) => state.inicio.results);
+  const [vendedorDescripcion, setVendedorDescripcion] = useState("");
+  const [tecnicoDescripcion, setTecnicoDescripcion] = useState("");
   const datosGlobales = useSelector((state) => state.datosGlobales.data);
   const dispatch = useDispatch();
   const [detalleVentas, setDetalleVentas] = useState(fichaDataVentas.DetVentas);
@@ -38,12 +41,32 @@ function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, s
   const [selectedRowsDet, setSelectedRowsDet] = useState([]);
   const [fichaDataDetVentas, setFichaDataDetVentas] = useState({});
   const [openSearchCliente, setOpenSearchCliente] = useState(false);
+  const [openSearchFormaPago, setOpenSearchFormaPago] = useState(false);
+  const [openSearchVendedor, setOpenSearchVendedor] = useState(false);
+  const [openSearchTecnico, setOpenSearchTecnico] = useState(false);
   const [openMessageUser, setOpenMessageUser] = useState(false);
-
+  const [dataTemporalVentas, setDataTemporalVentas] = useState(fichaDataVentas);
   moment.locale('es'); // Configura Moment.js para utilizar el idioma en español
   useEffect(() => {
     prepararDataDetVentas();
+
   },[detalleVentas]);
+  useEffect(() => {
+    cargarDescripcionPersonal(dataTemporalVentas.idVendedor,setVendedorDescripcion);
+    cargarDescripcionPersonal(dataTemporalVentas.idTecnico,setTecnicoDescripcion);
+  },[dataTemporalVentas]);
+  const cargarDescripcionPersonal = async (id, cargaNombres) => {
+    if (id>0){
+      try {
+        let reg = await axios.post('http://localhost:3001/personal/search', { id });
+        if (!reg) throw new Error("Error: No se encontraron Datos del Personal");
+        cargaNombres(reg.data[0].nombres);
+        console.log("cargarDescripcionPersonal",reg.data[0].nombres);
+      } catch (error) {
+        console.log("Error",error);
+      }
+    }
+  };
   const prepararDataDetVentas = async() => {
     let totales = {
       valorVentaTotal: 0,
@@ -53,7 +76,7 @@ function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, s
       igvTotal: 0,
       precioVentaTotal: 0
     }
-    if (fichaDataVentas.moneda){
+    if (dataTemporalVentas.moneda){
       totales.valorVentaTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.vvUnitME*+curr.cantidad), 0);
       totales.descuentoTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.descUnitME*+curr.cantidad), 0);
       totales.valorVentaNetoTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.vvNetoTotME), 0);
@@ -77,7 +100,7 @@ function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, s
         igvTotal: 0,
         precioVentaTotal: 0
       }
-      if (fichaDataVentas.moneda){
+      if (dataTemporalVentas.moneda){
         totalesFormateado.valorVentaTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.vvUnitME*+detVenta.cantidad)); 
         totalesFormateado.descuentoTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.descUnitME*+detVenta.cantidad));
         totalesFormateado.valorVentaNetoTotal = new Intl.NumberFormat('es-PE',{ minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.vvNetoTotME));
@@ -108,7 +131,7 @@ function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, s
     let columns =[{
                     field: 'producto',
                     headerName: 'Producto',
-                    width: 350,
+                    width: 300,
                     editable: false,
                     valueFormatter: (params) => `${params.value}`,
                     align: 'left',
@@ -117,7 +140,7 @@ function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, s
                   {
                     field: 'cantidad',
                     headerName: 'Cant.',
-                    width: 110,
+                    width: 100,
                     editable: false,
                     valueFormatter: (params) => `${params.value}`,
                     align: 'right',
@@ -126,7 +149,7 @@ function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, s
                   {
                     field: 'descuento',
                     headerName: 'Desc.',
-                    width: 110,
+                    width: 100,
                     editable: false,
                     valueFormatter: (params) => `${params.value}`,
                     align: 'right',
@@ -208,7 +231,7 @@ function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, s
 };
 const handleEditDetVentas =  (row) => {
   openEditModalDetVentas(); // Llama a la función openEditModalDetVentas para abrir el modal de edición
-  setFichaDataDetVentas(fichaDataVentas.DetVentas.find(objeto => +objeto.id === +row.id));
+  setFichaDataDetVentas(dataTemporalVentas.DetVentas.find(objeto => +objeto.id === +row.id));
 };
 const handleDeleteDetVentas = (row) => {
   console.log("row", row.id);
@@ -219,11 +242,12 @@ const handleShowDetVentas = (row) => {
 const openEditModalDetVentas = () => {
   setIsEditModalOpenDetVentas(true);
 };
-const closeEditModalDetVentas = () => {
+const closeEditModalDetVentas = async () => {
   setIsEditModalOpenDetVentas(false);
   if (fichaDataDetVentas){
+    await setFichaDataVentas(dataTemporalVentas);
     let updatedArrayDetVentas = [...detalleVentas];
-    let indiceDataDetVentas=updatedArrayDetVentas.findIndex(obj => +obj.id === +fichaDataDetVentas.id);
+    let indiceDataDetVentas= updatedArrayDetVentas.findIndex(obj => +obj.id === +fichaDataDetVentas.id);
     updatedArrayDetVentas[indiceDataDetVentas]=fichaDataDetVentas;
     setDetalleVentas(updatedArrayDetVentas);
     let updatedArray = [...results];
@@ -236,40 +260,40 @@ const closeEditModalDetVentas = () => {
 const handleSelectionChangeDetVentas = (newSelection) => {
   setSelectedRowsDet(newSelection);
 };
-
   const grabarCabVentas = async () => {
-    console.log("grabarCabVentas: fichaDataVentas",fichaDataVentas);
+    console.log("grabarCabVentas: dataTemporalVentas",dataTemporalVentas);
+    setFichaDataVentas(dataTemporalVentas);
     const datosCodificados = {
-      id: +fichaDataVentas.id,
-      fecha: formatDateStringToyyyymmdd(fichaDataVentas.fecha),
-      serieDcmto: fichaDataVentas.serieDcmto,
-      correlativoDcmto: fichaDataVentas.correlativoDcmto,
-      idContacto: +fichaDataVentas.idContacto,
-      idDirOrigen: +fichaDataVentas.idDirOrigen,
-      idDirEntrega: +fichaDataVentas.idDirEntrega,
-      observaciones: fichaDataVentas.observaciones,
-      idDocAlmacen: +fichaDataVentas.idDocAlmacen,
-      idVendedor: +fichaDataVentas.idVendedor,
-      idTecnico: +fichaDataVentas.idTecnico,
-      numPlacas: fichaDataVentas.numPlacas,
-      tipoCambio: +fichaDataVentas.tipoCambio,
-      porcentajeIGV: +fichaDataVentas.porcentajeIGV,
-      emailDestino: fichaDataVentas.emailDestino,
-      rutaDcmtoPDF: fichaDataVentas.rutaDcmtoPDF,
-      exonerado: fichaDataVentas.exonerado,
-      moneda: fichaDataVentas.moneda,
-      factElectOK: fichaDataVentas.factElectOK,
-      anticipo: fichaDataVentas.anticipo,
-      created: fichaDataVentas.created,
-      borradoLogico: fichaDataVentas.borradoLogico,
-      idHistorico: +fichaDataVentas.idHistorico,
-      ClienteProveedorId: +fichaDataVentas.ClienteProveedorId,
-      FormaPagoId: +fichaDataVentas.FormaPagoId,
-      EstadoDocId: +fichaDataVentas.EstadoDocId,
-      UsuarioId: +fichaDataVentas.UsuarioId,
-      TipoCambioId: +fichaDataVentas.TipoCambioId,
-      CentroCostoId: +fichaDataVentas.CentroCostoId,
-      CorrelativoDocId: +fichaDataVentas.CorrelativoDocId
+      id: +dataTemporalVentas.id,
+      fecha: formatDateStringToyyyymmdd(dataTemporalVentas.fecha),
+      serieDcmto: dataTemporalVentas.serieDcmto,
+      correlativoDcmto: dataTemporalVentas.correlativoDcmto,
+      idContacto: +dataTemporalVentas.idContacto,
+      idDirOrigen: +dataTemporalVentas.idDirOrigen,
+      idDirEntrega: +dataTemporalVentas.idDirEntrega,
+      observaciones: dataTemporalVentas.observaciones,
+      idDocAlmacen: +dataTemporalVentas.idDocAlmacen,
+      idVendedor: +dataTemporalVentas.idVendedor,
+      idTecnico: +dataTemporalVentas.idTecnico,
+      numPlacas: dataTemporalVentas.numPlacas,
+      tipoCambio: +dataTemporalVentas.tipoCambio,
+      porcentajeIGV: +dataTemporalVentas.porcentajeIGV,
+      emailDestino: dataTemporalVentas.emailDestino,
+      rutaDcmtoPDF: dataTemporalVentas.rutaDcmtoPDF,
+      exonerado: dataTemporalVentas.exonerado,
+      moneda: dataTemporalVentas.moneda,
+      factElectOK: dataTemporalVentas.factElectOK,
+      anticipo: dataTemporalVentas.anticipo,
+      created: dataTemporalVentas.created,
+      borradoLogico: dataTemporalVentas.borradoLogico,
+      idHistorico: +dataTemporalVentas.idHistorico,
+      ClienteProveedorId: +dataTemporalVentas.ClienteProveedorId,
+      FormaPagoId: +dataTemporalVentas.FormaPagoId,
+      EstadoDocId: +dataTemporalVentas.EstadoDocId,
+      UsuarioId: +dataTemporalVentas.UsuarioId,
+      TipoCambioId: +dataTemporalVentas.TipoCambioId,
+      CentroCostoId: +dataTemporalVentas.CentroCostoId,
+      CorrelativoDocId: +dataTemporalVentas.CorrelativoDocId
     };
     console.log("datosCodificados",datosCodificados);
     try {
@@ -294,39 +318,68 @@ const handleSelectionChangeDetVentas = (newSelection) => {
     setTotalesCabVentas([]);
     onClose();
   };
-//console.log("fichaDataVentas:", fichaDataVentas, fichaDataVentas.fecha,typeof fichaDataVentas.fecha);
+//console.log("dataTemporalVentas:", dataTemporalVentas, dataTemporalVentas.fecha,typeof dataTemporalVentas.fecha);
 const handleChangeCabVentas = (event) => {
   setFichaDataVentas({
-      ...fichaDataVentas,
+      ...dataTemporalVentas,
       [event.target.name]: event.target.value,
   });
 };
-const handleChangefecha = (fechaNueva) => {
-  setFichaDataVentas({
-    ...fichaDataVentas,
-    fecha: moment(fechaNueva.$d).format('DD/MM/YYYY'),
+const obtenerTCsegunFecha = async (fecha) =>{
+  console.log("obtenerTCsegunFecha",fecha);
+  try {
+    let reg = await axios.post('http://localhost:3001/tiposCambio/search', { fecha });
+    console.log("obtenerTCsegunFecha reg:",reg);
+    if (reg.data.length ===0){
+      let reg = await axios.get('http://localhost:3001/tiposCambio/last');
+      console.log("Ultimo reg.data>>>:", reg.data, { fecha: fecha,
+        compra: +reg.data.compra,
+        venta: +reg.data.venta,
+        idHistorico:0
+      });
+      if (!reg) throw new Error("Error: No se encontraron Datos en Tipo de Cambio");
+      let regNew = await axios.post('http://localhost:3001/tiposCambio', 
+                  { fecha: fecha,
+                    compra: +reg.data.compra,
+                    venta: +reg.data.venta,
+                    idHistorico:0
+                  });
+      console.log("regNew:",regNew.data);
+      return regNew.data;
+    }else{
+      return reg.data[0];
+    }
+  } catch (error) {
+    console.log("Error",error);
+  }
+};
+const handleChangefecha = async (fechaNueva) => {
+  let fechaConsulta = moment(fechaNueva.$d).format('YYYY-MM-DD') ;
+  console.log("handleChangefecha","fechaNueva:",fechaNueva, "fechaConsulta",fechaConsulta);
+  let regFecha= await obtenerTCsegunFecha(fechaConsulta);
+  console.log("regFecha*********:",regFecha, regFecha.fecha, formatDateStringToddmmyyyy(regFecha.fecha));
+  setDataTemporalVentas({
+    ...dataTemporalVentas,
+    fecha: formatDateStringToddmmyyyy(regFecha.fecha),
+    tipoCambio: +regFecha.venta,
+    TipoCambioId: +regFecha.id,
+    TipoCambio: regFecha
   });
 };
 const handleChangeBoolean = (event) => {
-  console.log("handleChangeBoolean",event.target)
-  setFichaDataVentas({
-    ...fichaDataVentas,
+ // console.log("handleChangeBoolean",event.target)
+ setDataTemporalVentas({
+    ...dataTemporalVentas,
     moneda: event.target.value,
   });
 }
 const handleChangeDesc = (event, name)=>{
-  console.log("handleChangeDesc",event.floatValue,name)
-  setFichaDataVentas({
-    ...fichaDataVentas,
+ // console.log("handleChangeDesc",event.floatValue,name)
+ setDataTemporalVentas({
+    ...dataTemporalVentas,
     [name]: event.floatValue
   });
 };
-const handleCloseSearchCliente = () => {
-  setOpenSearchCliente(false);
-}
-const handleOpenSearchCliente = () => {
-  setOpenSearchCliente(true);
-}
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -336,36 +389,37 @@ const handleCloseMessageUser = (event, reason) => {
   }
   setOpenMessageUser(false);
 };
-//console.log("fichaDataVentas",fichaDataVentas);
+console.log("dataTemporalVentas",dataTemporalVentas);
   return (
     <Dialog open={isOpen} fullWidth maxWidth="xl">
-      <DialogTitle>{fichaDataVentas.CorrelativoDoc.TipoDocumento.descripcion} ID:{fichaDataVentas.id}</DialogTitle>
+      <DialogTitle>{dataTemporalVentas.CorrelativoDoc.TipoDocumento.descripcion} ID:{dataTemporalVentas.id}</DialogTitle>
       <DialogContent>
         <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:0.5,mb:0.5}}>
             <Grid2 xs={4}>
-              <TextField fullWidth className="campoInput" margin='none' label="Serie Dcmto" variant="outlined" size="small" disabled={true} value={fichaDataVentas.serieDcmto} onChange={handleChangeCabVentas} />
+              <TextField fullWidth className="campoInput" margin='none' label="Serie Dcmto" variant="outlined" size="small" disabled={true} value={dataTemporalVentas.serieDcmto} onChange={handleChangeCabVentas} />
             </Grid2>
             <Grid2 xs={4}>
-              <TextField fullWidth className="campoInput" margin='none' label="N° Correlativo" variant="outlined" size="small" disabled={true} value={fichaDataVentas.correlativoDcmto} onChange={handleChangeCabVentas} />
+              <TextField fullWidth className="campoInput" margin='none' label="N° Correlativo" variant="outlined" size="small" disabled={true} value={dataTemporalVentas.correlativoDcmto} onChange={handleChangeCabVentas} />
             </Grid2>
             <Grid2 xs={4}>
-              <DatePicker className="campoInput" label="Fecha" format="DD/MM/YYYY" formatDensity='dense' size="small" value={dayjs(formatDateStringToyyyymmdd(fichaDataVentas.fecha))} onChange={(newValue) => handleChangefecha(newValue)} />
+              <DatePicker className="campoInput" label="Fecha" format="DD/MM/YYYY" formatDensity='dense' size="small" value={dayjs(formatDateStringToyyyymmdd(dataTemporalVentas.fecha))} onAccept={(newValue) => handleChangefecha(newValue)} />
             </Grid2>
         </Grid2>
         <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:0.5,mb:0.5}}>
             <Grid2 xs={4}>
               <NumericFormat
+                fullWidth
                 margin='none'
                 variant='outlined'
                 disabled={true}
                 label="T/C"
-                value={fichaDataVentas.tipoCambio}
+                value={dataTemporalVentas.tipoCambio}
                 name='tipoCambio'
                 thousandSeparator=","
                 decimalSeparator="."
                 decimalScale={2}
                 fixedDecimalScale
-                prefix={""}
+                prefix={dataTemporalVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
                 suffix=''
                 className="campoInput"
                 size="small"
@@ -375,7 +429,7 @@ const handleCloseMessageUser = (event, reason) => {
             <Grid2 xs={4}>
               <FormControl fullWidth>
                 <InputLabel id="moneda">Moneda</InputLabel>
-                <Select labelId="moneda" name="moneda" id="moneda" value={fichaDataVentas.moneda} label="Moneda" size="small" onChange={handleChangeBoolean}>
+                <Select labelId="moneda" name="moneda" id="moneda" value={dataTemporalVentas.moneda} label="Moneda" size="small" onChange={handleChangeBoolean}>
                   <MenuItem value={true}>{datosGlobales.descripCortaME}</MenuItem>
                   <MenuItem value={false}>{datosGlobales.descripCortaMN}</MenuItem>
                 </Select>
@@ -383,11 +437,12 @@ const handleCloseMessageUser = (event, reason) => {
             </Grid2>
             <Grid2 xs={4}>
               <NumericFormat
+                fullWidth
                 margin='none'
                 variant='outlined'
-                disabled={false}
+                disabled={true}
                 label="% IGV"
-                value={fichaDataVentas.porcentajeIGV}
+                value={dataTemporalVentas.porcentajeIGV}
                 name='porcentajeIGV'
                 thousandSeparator=","
                 decimalSeparator="."
@@ -402,19 +457,21 @@ const handleCloseMessageUser = (event, reason) => {
               />
             </Grid2>
         </Grid2>
-        <Grid2 container  xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:0.5,mb:0.5}}>
-          <Grid2 xs={5.5}>
-            <TextField fullWidth className="campoInput" margin='none' label="Cliente" variant="outlined" size="small" value={fichaDataVentas.ClienteProveedor.razonSocial} />
+        <Grid2 container  xs={12}  spacing={0.5} sx={{mt:0.5,mb:0.5}}>
+          <Grid2 xs={6}>
+            <TextField fullWidth className="campoInput" margin='none' label="Cliente" variant="outlined" size="small" value={dataTemporalVentas.ClienteProveedor.razonSocial} disabled={true}/>
           </Grid2>
-          <Grid2 xs={1.5}>
-            <Button variant="contained" size="large" color="success" startIcon={<Search />} onClick={handleOpenSearchCliente}/>
+          <Grid2 xs={1}>
+            <IconButton sx={{ml:1}} size="medium" color='success' onClick={() => setOpenSearchCliente(true)}>
+              <Search />
+            </IconButton>
           </Grid2>
           {openSearchCliente && (
             <FichaSearchCliente 
               isOpen={openSearchCliente} 
-              onClose={handleCloseSearchCliente} 
-              fichaDataVentas={fichaDataVentas} 
-              setFichaDataVentas={setFichaDataVentas}
+              onClose={() => setOpenSearchCliente(false)} 
+              fichaDataVentas={dataTemporalVentas} 
+              setFichaDataVentas={setDataTemporalVentas}
               setOpenMessageUser={setOpenMessageUser}/>
           )}
           {openMessageUser && (
@@ -424,21 +481,91 @@ const handleCloseMessageUser = (event, reason) => {
               </Alert>
             </Snackbar>
           )}
-                      
           <Grid2 xs={4}>
-            <TextField fullWidth className="campoInput" margin='none' label="Forma de Pago" variant="outlined" size="small" value={fichaDataVentas.FormaPago.descripcion} onChange={handleChangeCabVentas} />
+            <TextField fullWidth className="campoInput" margin='none' label="Forma de Pago" variant="outlined" size="small" value={dataTemporalVentas.FormaPago.descripcion} disabled={true}/>
           </Grid2>
           <Grid2 xs={1}>
-            <Button variant="contained" size="large" color="success" startIcon={<Search />} onClick={handleChangeCabVentas}/>
+            <IconButton sx={{ml:1}} size="medium" color='success' onClick={() => setOpenSearchFormaPago(true)}>
+              <Search />
+            </IconButton>
           </Grid2>
+          {openSearchFormaPago && (
+            <FichaSearchGeneral 
+              titulo={"Buscar Formas de Pago"}
+              isOpen={openSearchFormaPago} 
+              onClose={()=>setOpenSearchFormaPago(false)} 
+              fichaDataVentas={dataTemporalVentas} 
+              setFichaDataVentas={setDataTemporalVentas}
+              setOpenMessageUser={setOpenMessageUser}
+              rutaPost={"http://localhost:3001/formasPago/search"}
+              campoLabel={"descripcion"}
+              campoId={"FormaPagoId"}
+              campoObjecto={"FormaPago"}/>
+          )}
+          {openMessageUser && (
+            <Snackbar open={openMessageUser} autoHideDuration={6000} onClose={handleCloseMessageUser}>
+              <Alert onClose={handleCloseMessageUser} severity="success" sx={{ width: '100%' }}>
+                Actualizando Datos de la Forma de Pago, no olvide GUARDAR los cambios
+              </Alert>
+            </Snackbar>
+          )}
+
         </Grid2>
-        <Grid2 container  xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:0.5,mb:0.5}}>
-            <Grid2 xs={7}>
-              <TextField fullWidth className="campoInput" margin='none' label="Vendedor" variant="outlined" size="small" value={fichaDataVentas.idVendedor} onChange={handleChangeCabVentas} />
+        <Grid2 container  xs={12} spacing={0.5} sx={{mt:0.5,mb:0.5}}>
+            <Grid2 xs={6}>
+              <TextField fullWidth className="campoInput" margin='none' label="Vendedor" variant="outlined" size="small" value={vendedorDescripcion}  disabled={true} />
             </Grid2>
-            <Grid2 xs={5}>
-              <TextField fullWidth className="campoInput" margin='none' label="Tecnico" variant="outlined" size="small" value={fichaDataVentas.idTecnico} onChange={handleChangeCabVentas} />
+            <Grid2 xs={1}>
+              <IconButton sx={{ml:1}} size="medium" color='success' onClick={()=>setOpenSearchVendedor(true)}>
+                <Search />
+              </IconButton>
             </Grid2>
+            {openSearchVendedor && (
+              <FichaSearchGeneral 
+                titulo={"Buscar Vendedor"}
+                isOpen={openSearchVendedor} 
+                onClose={()=>setOpenSearchVendedor(false)} 
+                fichaDataVentas={dataTemporalVentas} 
+                setFichaDataVentas={setDataTemporalVentas}
+                setOpenMessageUser={setOpenMessageUser}
+                rutaPost={"http://localhost:3001/personal/search"}
+                campoLabel={"nombres"}
+                campoId={"idVendedor"}/>
+            )}
+            {openMessageUser && (
+              <Snackbar open={openMessageUser} autoHideDuration={6000} onClose={handleCloseMessageUser}>
+                <Alert onClose={handleCloseMessageUser} severity="success" sx={{ width: '100%' }}>
+                  Actualizando Datos del Vendedor, no olvide GUARDAR los cambios
+                </Alert>
+              </Snackbar>
+            )}
+            <Grid2 xs={4}>
+              <TextField fullWidth className="campoInput" margin='none' label="Tecnico" variant="outlined" size="small" value={tecnicoDescripcion} disabled={true} />
+            </Grid2>
+            <Grid2 xs={1}>
+              <IconButton sx={{ml:1}} size="medium" color='success' onClick={()=>setOpenSearchTecnico(true)}>
+                <Search />
+              </IconButton>
+            </Grid2>
+            {openSearchTecnico && (
+              <FichaSearchGeneral 
+                titulo={"Buscar Tecnico"}
+                isOpen={openSearchTecnico} 
+                onClose={()=>setOpenSearchTecnico(false)} 
+                fichaDataVentas={dataTemporalVentas} 
+                setFichaDataVentas={setDataTemporalVentas}
+                setOpenMessageUser={setOpenMessageUser}
+                rutaPost={"http://localhost:3001/personal/search"}
+                campoLabel={"nombres"}
+                campoId={"idTecnico"}/>
+            )}
+            {openMessageUser && (
+              <Snackbar open={openMessageUser} autoHideDuration={6000} onClose={handleCloseMessageUser}>
+                <Alert onClose={handleCloseMessageUser} severity="success" sx={{ width: '100%' }}>
+                  Actualizando Datos del Tecnico Instalador, no olvide GUARDAR los cambios
+                </Alert>
+              </Snackbar>
+            )}
         </Grid2>
         <DataGrid 
             rows={detTableData} 
@@ -447,10 +574,10 @@ const handleCloseMessageUser = (event, reason) => {
             density='compact'
             initialState={{
               pagination: {
-              paginationModel: { page: 0, pageSize: 10 },
+              paginationModel: { page: 0, pageSize: 8 },
               },
           }}
-          pageSizeOptions={[10, 20,30,40,50]}
+          pageSizeOptions={[8, 16,24,32,40]}
             rowSelectionModel={selectedRowsDet}
             onRowSelectionModelChange={handleSelectionChangeDetVentas}
         />
@@ -461,12 +588,12 @@ const handleCloseMessageUser = (event, reason) => {
                 setSelectedRowsDet={setSelectedRowsDet}
                 fichaDataDetVentas={fichaDataDetVentas}
                 setFichaDataDetVentas={setFichaDataDetVentas}
-                fichaDataVentas={fichaDataVentas}
+                fichaDataVentas={dataTemporalVentas}
             />
         )}
         <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:1.5}}>
           <Grid2 xs={4}>
-            {/* <TextField className="campoInput" margin='none' label="V.Venta" variant="outlined" size="small" disabled={true} InputProps={{ startAdornment: <InputAdornment position="start">{fichaDataVentas.moneda?"US$":"S/."}</InputAdornment> }} value={valorVentaTotal} onChange={handleChangeCabVentas} /> */}
+            {/* <TextField className="campoInput" margin='none' label="V.Venta" variant="outlined" size="small" disabled={true} InputProps={{ startAdornment: <InputAdornment position="start">{dataTemporalVentas.moneda?"US$":"S/."}</InputAdornment> }} value={valorVentaTotal} onChange={handleChangeCabVentas} /> */}
             <NumericFormat
               margin='none'
               variant='outlined'
@@ -478,7 +605,7 @@ const handleCloseMessageUser = (event, reason) => {
               decimalSeparator="."
               decimalScale={2}
               fixedDecimalScale
-              prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+              prefix={dataTemporalVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
               suffix=''
               className="campoInput"
               size="small"
@@ -497,7 +624,7 @@ const handleCloseMessageUser = (event, reason) => {
               decimalSeparator="."
               decimalScale={2}
               fixedDecimalScale
-              prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+              prefix={dataTemporalVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
               suffix=''
               className="campoInput"
               size="small"
@@ -539,7 +666,7 @@ const handleCloseMessageUser = (event, reason) => {
               decimalSeparator="."
               decimalScale={2}
               fixedDecimalScale
-              prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+              prefix={dataTemporalVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
               suffix=''
               className="campoInput"
               size="small"
@@ -558,7 +685,7 @@ const handleCloseMessageUser = (event, reason) => {
               decimalSeparator="."
               decimalScale={2}
               fixedDecimalScale
-              prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+              prefix={dataTemporalVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
               suffix=''
               className="campoInput"
               size="small"
@@ -577,7 +704,7 @@ const handleCloseMessageUser = (event, reason) => {
               decimalSeparator="."
               decimalScale={2}
               fixedDecimalScale
-              prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+              prefix={dataTemporalVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
               suffix=''
               className="campoInput"
               size="small"

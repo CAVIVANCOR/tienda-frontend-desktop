@@ -1,56 +1,60 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, CardMedia, Card, CardContent, Typography, CardHeader } from '@mui/material';
+import React, { useState } from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, CardMedia, Card, CardContent, Typography, CardHeader, InputAdornment } from '@mui/material';
 import 'moment/locale/es'; // Importa el idioma si lo necesitas
 import axios from 'axios';
 import { NumericFormat } from 'react-number-format';
 import { useSelector } from 'react-redux';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import {detectarDispositivo} from '../../../utilities/utilities';
+import { Discount, Inventory, LocalOffer, Percent, PriceChange } from '@mui/icons-material';
 
 function FichaDetVentasModal({ isOpen, onClose, setSelectedRowsDet, fichaDataDetVentas, setFichaDataDetVentas, fichaDataVentas }) {
+  const [dataTemporalDetVentas, setDataTemporalDetVentas] = useState(fichaDataDetVentas);
   const datosGlobales = useSelector((state) => state.datosGlobales.data);
   const handleChange = (event) => {
-    setFichaDataDetVentas({
-        ...fichaDataDetVentas,
+    console.log("handleChange",event.target.name,event.target.value);
+    setDataTemporalDetVentas({
+        ...dataTemporalDetVentas,
         [event.target.name]: event.target.value,
     });
   };
   const grabarDetVentas = async () => {
-    console.log("grabarDetVentas: fichaDataDetVentas",fichaDataDetVentas);
+    setFichaDataDetVentas(dataTemporalDetVentas);
+    console.log("grabarDetVentas: dataTemporalDetVentas",dataTemporalDetVentas);
     const datosCodificados = {
-      id: +fichaDataDetVentas.id,
-      cantidad: fichaDataDetVentas.cantidad,
-      vvUnitMN: fichaDataDetVentas.vvUnitMN,
-      vvUnitME: +fichaDataDetVentas.vvUnitME,
-      porcentajeDescUnit: +fichaDataDetVentas.porcentajeDescUnit,
-      descUnitMN: +fichaDataDetVentas.descUnitMN,
-      descUnitME: fichaDataDetVentas.descUnitME,
-      vvNetoUnitMN: +fichaDataDetVentas.vvNetoUnitMN,
-      vvNetoUnitME: +fichaDataDetVentas.vvNetoUnitME,
-      vvNetoTotMN: +fichaDataDetVentas.vvNetoTotMN,
-      vvNetoTotME: fichaDataDetVentas.vvNetoTotME,
-      igvUnitMN: +fichaDataDetVentas.igvUnitMN,
-      igvUnitME: +fichaDataDetVentas.igvUnitME,
-      igvTotalMN: fichaDataDetVentas.igvTotalMN,
-      igvTotalME: fichaDataDetVentas.igvTotalME,
-      pvUnitMN: fichaDataDetVentas.pvUnitMN,
-      pvUnitME: fichaDataDetVentas.pvUnitME,
-      pvTotalMN: fichaDataDetVentas.pvTotalMN,
-      pvTotalME: fichaDataDetVentas.pvTotalME,
-      rutaFotoInstalacion01: fichaDataDetVentas.rutaFotoInstalacion01,
-      rutaFotoInstalacion02: fichaDataDetVentas.rutaFotoInstalacion02,
-      exonerado: +fichaDataDetVentas.exonerado,
-      idApruebaDesc: +fichaDataDetVentas.idApruebaDesc,
-      fechaApruebaDesc: +fichaDataDetVentas.fechaApruebaDesc,
-      descUnitMontoMN: +fichaDataDetVentas.descUnitMontoMN,
-      descUnitMontoME: +fichaDataDetVentas.descUnitMontoME,
-      nroMesesGarantia: +fichaDataDetVentas.nroMesesGarantia,
-      idPreciosCliProv: +fichaDataDetVentas.idPreciosCliProv,
-      borradoLogico: +fichaDataDetVentas.borradoLogico,
-      ProductoId: +fichaDataDetVentas.ProductoId,
-      EstadoProdId: +fichaDataDetVentas.EstadoProdId,
+      id: +dataTemporalDetVentas.id,
+      cantidad: dataTemporalDetVentas.cantidad,
+      vvUnitMN: dataTemporalDetVentas.vvUnitMN,
+      vvUnitME: +dataTemporalDetVentas.vvUnitME,
+      porcentajeDescUnit: +dataTemporalDetVentas.porcentajeDescUnit,
+      descUnitMN: +dataTemporalDetVentas.descUnitMN,
+      descUnitME: dataTemporalDetVentas.descUnitME,
+      vvNetoUnitMN: +dataTemporalDetVentas.vvNetoUnitMN,
+      vvNetoUnitME: +dataTemporalDetVentas.vvNetoUnitME,
+      vvNetoTotMN: +dataTemporalDetVentas.vvNetoTotMN,
+      vvNetoTotME: dataTemporalDetVentas.vvNetoTotME,
+      igvUnitMN: +dataTemporalDetVentas.igvUnitMN,
+      igvUnitME: +dataTemporalDetVentas.igvUnitME,
+      igvTotalMN: dataTemporalDetVentas.igvTotalMN,
+      igvTotalME: dataTemporalDetVentas.igvTotalME,
+      pvUnitMN: dataTemporalDetVentas.pvUnitMN,
+      pvUnitME: dataTemporalDetVentas.pvUnitME,
+      pvTotalMN: dataTemporalDetVentas.pvTotalMN,
+      pvTotalME: dataTemporalDetVentas.pvTotalME,
+      rutaFotoInstalacion01: dataTemporalDetVentas.rutaFotoInstalacion01,
+      rutaFotoInstalacion02: dataTemporalDetVentas.rutaFotoInstalacion02,
+      exonerado: +dataTemporalDetVentas.exonerado,
+      idApruebaDesc: +dataTemporalDetVentas.idApruebaDesc,
+      fechaApruebaDesc: +dataTemporalDetVentas.fechaApruebaDesc,
+      descUnitMontoMN: +dataTemporalDetVentas.descUnitMontoMN,
+      descUnitMontoME: +dataTemporalDetVentas.descUnitMontoME,
+      nroMesesGarantia: +dataTemporalDetVentas.nroMesesGarantia,
+      idPreciosCliProv: +dataTemporalDetVentas.idPreciosCliProv,
+      borradoLogico: +dataTemporalDetVentas.borradoLogico,
+      ProductoId: +dataTemporalDetVentas.ProductoId,
+      EstadoProdId: +dataTemporalDetVentas.EstadoProdId,
     };
     console.log("datosCodificados",datosCodificados);
     try {
@@ -76,79 +80,106 @@ function FichaDetVentasModal({ isOpen, onClose, setSelectedRowsDet, fichaDataDet
 //console.log("fichaDataVentas:", fichaDataVentas, fichaDataVentas.fecha,typeof fichaDataVentas.fecha);
 const handleChangeDesc = (event, name)=>{
   setFichaDataDetVentas({
-    ...fichaDataDetVentas,
+    ...dataTemporalDetVentas,
     [name]: event.floatValue
   });
 };
-console.log("fichaDataDetVentas",fichaDataDetVentas,fichaDataDetVentas.Producto.urlFotoProducto, detectarDispositivo(), detectarDispositivo()==='Celular' ? 'column' : 'row');
-const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoProducto}`;
-
+//console.log("fichaDataDetVentas",fichaDataDetVentas,fichaDataDetVentas.Producto.urlFotoProducto, detectarDispositivo(), detectarDispositivo()==='Celular' ? 'column' : 'row');
+const imgProducto = `http://localhost:3001${dataTemporalDetVentas.Producto.urlFotoProducto}`;
   return (
     <Dialog open={isOpen} fullWidth maxWidth="md">
-      <DialogTitle>Ficha Detalle Venta ID:{fichaDataDetVentas.id}</DialogTitle>
+      <DialogTitle>Ficha Detalle Venta ID:{dataTemporalDetVentas.id}</DialogTitle>
       <DialogContent>
         <Card>
           <Typography sx={{ borderColor: 'primary.main', color: 'primary.main'}} gutterBottom align="center" variant="h6">
-            {fichaDataDetVentas.Producto.descripcion}
+            {dataTemporalDetVentas.Producto.descripcion}
           </Typography>
-          <CardMedia component="img" src={imgProducto} sx={{maxHeight: 280, minHeight: 100, borderRadius: 10, padding: 1, alignItems:'center', justifyContent:'center'}} title={fichaDataDetVentas.Producto.descripcion} />
+          <CardMedia component="img" src={imgProducto} sx={{objectFit: 'contain', maxHeight: 300, minHeight: 100}} title={dataTemporalDetVentas.Producto.descripcion} />
           <CardContent sx={{mb: -3, alignItems: 'center', justifyContent: 'center', display: 'flex', flexDirection: detectarDispositivo()==='Celular' ? 'column' : 'row'}}>
-            <TextField id='idProd' label='ID Producto' variant="outlined" value={fichaDataDetVentas.ProductoId} size='small' disabled sx={{marginBottom: 1}} />
-            <TextField id='CodProveedorProd' label='Cod. Proveedor' variant="outlined" value={fichaDataDetVentas.Producto.codigoProveedor!==""?fichaDataDetVentas.Producto.codigoProveedor:'S/C'} size='small' disabled sx={{marginBottom: 1}} />
-            <TextField id='ModeloProd' label='Modelo Prod.' variant="outlined" defaultValue={fichaDataDetVentas.Producto.modeloFabricante!==""?fichaDataDetVentas.Producto.modeloFabricante:'S/M'} size='small' disabled sx={{marginBottom: 1}} />
+            <TextField id='idProd' label='ID Producto' variant="outlined" value={dataTemporalDetVentas.ProductoId} size='small' disabled sx={{marginBottom: 1}} />
+            <TextField id='CodProveedorProd' label='Cod. Proveedor' variant="outlined" value={dataTemporalDetVentas.Producto.codigoProveedor!==""?dataTemporalDetVentas.Producto.codigoProveedor:'S/C'} size='small' disabled sx={{marginBottom: 1}} />
+            <TextField id='ModeloProd' label='Modelo Prod.' variant="outlined" defaultValue={dataTemporalDetVentas.Producto.modeloFabricante!==""?dataTemporalDetVentas.Producto.modeloFabricante:'S/M'} size='small' disabled sx={{marginBottom: 1}} />
           </CardContent>
         </Card>
         <Grid2 container spacing={2} justifyContent="center" alignItems="center" mt={1}>
           <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid2 xs={4}>
-              <NumericFormat
+            <Grid2 xs={3}>
+              <TextField
                 margin='none'
                 variant='outlined'
                 disabled={false}
+                fullWidth
                 label="Cantidad"
-                value={fichaDataDetVentas.cantidad}
+                value={dataTemporalDetVentas.cantidad}
                 name='cantidad'
+                type='number'
                 thousandSeparator=","
                 decimalSeparator="."
                 decimalScale={2}
                 fixedDecimalScale
-                prefix={""}
-                suffix=''
-                className="campoInput"
                 size="small"
-                customInput={TextField }
-                onValueChange={handleChange}
+                onChange={handleChange}
+                InputProps={{
+                  startAdornment: (<InputAdornment position="start">
+                    <Inventory />
+                  </InputAdornment>
+                ),}}
               />
             </Grid2>
-            <Grid2 xs={4}>
-              <NumericFormat
+            <Grid2 xs={3}>
+              <TextField
                 margin='none'
                 variant='outlined'
                 disabled={false}
-                label="P.V.Unit."
-                value={fichaDataVentas.moneda?fichaDataDetVentas.pvUnitME:fichaDataDetVentas.pvUnitMN}
-                name='pvunit'
+                fullWidth
+                label="Desc.Monto Unit."
+                value={fichaDataVentas.moneda?dataTemporalDetVentas.descUnitMontoME:dataTemporalDetVentas.descUnitMontoMN}
+                name={fichaDataVentas.moneda?"descUnitMontoME":"descUnitMontoMN"}
                 thousandSeparator=","
                 decimalSeparator="."
                 decimalScale={2}
                 fixedDecimalScale
-                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
-                suffix=''
-                className="campoInput"
                 size="small"
-                customInput={TextField }
-                onValueChange={handleChange}
+                InputProps={{
+                  startAdornment: (<InputAdornment position="start">
+                    <Discount />
+                    {fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
+                  </InputAdornment>
+                ),}}
+                onChange={(values) => handleChangeDesc(values, fichaDataVentas.moneda?"descUnitMontoME":"descUnitMontoMN")}
               />
             </Grid2>
-          </Grid2>
-          <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid2 xs={4}>
+            <Grid2 xs={3}>
+              <TextField
+                margin='none'
+                variant='outlined'
+                disabled={false}
+                fullWidth
+                label="Desc.Unit.%"
+                value={dataTemporalDetVentas.porcentajeDescUnit}
+                name='porcentajeDescUnit'
+                thousandSeparator=","
+                decimalSeparator="."
+                decimalScale={2}
+                fixedDecimalScale
+                size="small"
+                InputProps={{
+                  startAdornment: (<InputAdornment position="start">
+                    <Discount />
+                    <Percent />
+                  </InputAdornment>
+                ),}}
+                onChange={(values) => handleChangeDesc(values, "porcentajeDescUnit")}
+                />
+            </Grid2>
+            <Grid2 xs={3}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
                 disabled={true}
+                fullWidth
                 label="Desc.Unit."
-                value={fichaDataVentas.moneda?fichaDataDetVentas.descUnitME:fichaDataDetVentas.descUnitMN}
+                value={fichaDataVentas.moneda?dataTemporalDetVentas.descUnitME:dataTemporalDetVentas.descUnitMN}
                 name='descunit'
                 thousandSeparator=","
                 decimalSeparator="."
@@ -162,55 +193,18 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 onValueChange={handleChange}
               />
             </Grid2>
-            <Grid2 xs={4}>
-              <NumericFormat
-                margin='none'
-                variant='outlined'
-                disabled={false}
-                label="Desc.Unit.%"
-                value={fichaDataDetVentas.porcentajeDescUnit}
-                name='porcentajeDescUnit'
-                thousandSeparator=","
-                decimalSeparator="."
-                decimalScale={2}
-                fixedDecimalScale
-                prefix={""}
-                suffix=''
-                className="campoInput"
-                size="small"
-                customInput={TextField }
-                onValueChange={(values) => handleChangeDesc(values, "porcentajeDescUnit")}
-                />
-            </Grid2>
-            <Grid2 xs={4}>
-              <NumericFormat
-                margin='none'
-                variant='outlined'
-                disabled={false}
-                label="Desc.Monto Unit."
-                value={fichaDataVentas.moneda?fichaDataDetVentas.descUnitMontoME:fichaDataDetVentas.descUnitMontoMN}
-                name={fichaDataVentas.moneda?"descUnitMontoME":"descUnitMontoMN"}
-                thousandSeparator=","
-                decimalSeparator="."
-                decimalScale={2}
-                fixedDecimalScale
-                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
-                suffix=''
-                className="campoInput"
-                size="small"
-                customInput={TextField }
-                onValueChange={(values) => handleChangeDesc(values, fichaDataVentas.moneda?"descUnitMontoME":"descUnitMontoMN")}
-              />
-            </Grid2>
           </Grid2>
           <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
-            <Grid2 xs={4}>
+          </Grid2>
+          <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
+            <Grid2 xs={3}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
                 disabled={true}
+                fullWidth
                 label="V.V. Unit."
-                value={fichaDataVentas.moneda?fichaDataDetVentas.vvUnitME:fichaDataDetVentas.vvUnitMN}
+                value={fichaDataVentas.moneda?dataTemporalDetVentas.vvUnitME:dataTemporalDetVentas.vvUnitMN}
                 name='vventaunit'
                 thousandSeparator=","
                 decimalSeparator="."
@@ -224,13 +218,14 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 onValueChange={handleChange}
               />
             </Grid2>
-            <Grid2 xs={4}>
+            <Grid2 xs={3}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
                 disabled={true}
-                label="V.V.N. Unit."
-                value={fichaDataVentas.moneda?fichaDataDetVentas.vvNetoUnitME:fichaDataDetVentas.vvNetoUnitMN}
+                fullWidth
+                label="V.V.Neto Unit."
+                value={fichaDataVentas.moneda?dataTemporalDetVentas.vvNetoUnitME:dataTemporalDetVentas.vvNetoUnitMN}
                 name='vventanetounit'
                 thousandSeparator=","
                 decimalSeparator="."
@@ -244,13 +239,14 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 onValueChange={handleChange}
               />
             </Grid2>
-            <Grid2 xs={4}>
+            <Grid2 xs={3}>
               <NumericFormat
                 margin='none'
                 variant='outlined'
                 disabled={true}
+                fullWidth
                 label="IGV Unit."
-                value={fichaDataVentas.moneda?fichaDataDetVentas.igvUnitME:fichaDataDetVentas.igvUnitMN}
+                value={fichaDataVentas.moneda?dataTemporalDetVentas.igvUnitME:dataTemporalDetVentas.igvUnitMN}
                 name='igvunit'
                 thousandSeparator=","
                 decimalSeparator="."
@@ -264,6 +260,30 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 onValueChange={handleChange}
               />
             </Grid2>
+            <Grid2 xs={3}>
+              <TextField
+                margin="none"
+                variant="outlined"
+                disabled={false}
+                fullWidth
+                label="P.V.Unit."
+                value={fichaDataVentas.moneda ? dataTemporalDetVentas.pvUnitME : dataTemporalDetVentas.pvUnitMN}
+                name={fichaDataVentas.moneda ? "pvUnitME" : "pvUnitMN"}
+                type="number"
+                thousandSeparator=","
+                decimalSeparator="."
+                decimalScale={2}
+                fixedDecimalScale
+                InputProps={{
+                  startAdornment: (<InputAdornment position="start">
+                    <LocalOffer />
+                    {fichaDataVentas.moneda ? datosGlobales.descripCortaME : datosGlobales.descripCortaMN}
+                  </InputAdornment>
+                ),}}
+                size="small"
+                onChange={handleChange}
+              />
+            </Grid2>
           </Grid2>
           <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={2}>
             <Grid2 xs={4}>
@@ -271,8 +291,9 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 margin='none'
                 variant='outlined'
                 disabled={true}
-                label="V.V.Neto"
-                value={fichaDataVentas.moneda?fichaDataDetVentas.vvNetoTotME:fichaDataDetVentas.vvNetoTotMN}
+                fullWidth
+                label="V.V.Neto Total"
+                value={fichaDataVentas.moneda?dataTemporalDetVentas.vvNetoTotME:dataTemporalDetVentas.vvNetoTotMN}
                 name='vventanetototal'
                 thousandSeparator=","
                 decimalSeparator="."
@@ -280,7 +301,6 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 fixedDecimalScale
                 prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
                 suffix=''
-                className="campoInput"
                 size="small"
                 customInput={TextField }
                 onValueChange={handleChange}
@@ -291,8 +311,9 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 margin='none'
                 variant='outlined'
                 disabled={true}
+                fullWidth
                 label="IGV Total"
-                value={fichaDataVentas.moneda?fichaDataDetVentas.igvTotalME:fichaDataDetVentas.igvTotalMN}
+                value={fichaDataVentas.moneda?dataTemporalDetVentas.igvTotalME:dataTemporalDetVentas.igvTotalMN}
                 name='igvtotal'
                 thousandSeparator=","
                 decimalSeparator="."
@@ -300,30 +321,33 @@ const imgProducto = `http://localhost:3001${fichaDataDetVentas.Producto.urlFotoP
                 fixedDecimalScale
                 prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
                 suffix=''
-                className="campoInput"
                 size="small"
                 customInput={TextField }
                 onValueChange={handleChange}
               />
             </Grid2>
             <Grid2 xs={4}>
-              <NumericFormat
+              <TextField
                 margin='none'
                 variant='outlined'
                 disabled={false}
+                fullWidth
                 label="P.V.Total"
-                value={fichaDataVentas.moneda?fichaDataDetVentas.pvTotalME:fichaDataDetVentas.pvTotalMN}
-                name='pvtotal'
+                value={fichaDataVentas.moneda?dataTemporalDetVentas.pvTotalME:dataTemporalDetVentas.pvTotalMN}
+                name={fichaDataVentas.moneda?"pvTotalME":"pvTotalMN"}
+                type='number'
                 thousandSeparator=","
                 decimalSeparator="."
                 decimalScale={2}
                 fixedDecimalScale
-                prefix={fichaDataVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}
-                suffix=''
-                className="campoInput"
+                InputProps={{
+                  startAdornment: (<InputAdornment position="start">
+                    <LocalOffer />
+                    {fichaDataVentas.moneda ? datosGlobales.descripCortaME : datosGlobales.descripCortaMN}
+                  </InputAdornment>
+                ),}}
                 size="small"
-                customInput={TextField }
-                onValueChange={handleChange}
+                onChange={handleChange}
               />
             </Grid2>
           </Grid2>
