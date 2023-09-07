@@ -19,7 +19,8 @@ import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import FichaSearchCliente from './FichaSearchCliente';
 import MuiAlert from '@mui/material/Alert';
 import FichaSearchGeneral from './FichaSearchGeneral';
-
+import { prepararDataDetVentas } from './aPrepararDataGrids';
+import { grabarCabVentas, cargarDescripcionPersonal, obtenerTCsegunFecha } from './bOperacionesApiData';
 function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, setFichaDataVentas }) {
   const results = useSelector((state) => state.inicio.results);
   const [vendedorDescripcion, setVendedorDescripcion] = useState("");
@@ -46,189 +47,19 @@ function FichaVentasModal({ isOpen, onClose, setSelectedRows, fichaDataVentas, s
   const [openSearchTecnico, setOpenSearchTecnico] = useState(false);
   const [openMessageUser, setOpenMessageUser] = useState(false);
   const [dataTemporalVentas, setDataTemporalVentas] = useState(fichaDataVentas);
+  const [formaAplicarDescuento, setFormaAplicarDescuento] = useState(false);
+  const [descuentoAplicar, setDescuentoAplicar] = useState(0);
   moment.locale('es'); // Configura Moment.js para utilizar el idioma en español
   useEffect(() => {
-    prepararDataDetVentas();
-
+    prepararDataDetVentas(dataTemporalVentas,detalleVentas,handleEditDetVentas,handleDeleteDetVentas,setDetTableData,setDetTableColumns,setTotalesCabVentas);
   },[detalleVentas]);
+  
   useEffect(() => {
     cargarDescripcionPersonal(dataTemporalVentas.idVendedor,setVendedorDescripcion);
     cargarDescripcionPersonal(dataTemporalVentas.idTecnico,setTecnicoDescripcion);
   },[dataTemporalVentas]);
-  const cargarDescripcionPersonal = async (id, cargaNombres) => {
-    if (id>0){
-      try {
-        let reg = await axios.post('http://localhost:3001/personal/search', { id });
-        if (!reg) throw new Error("Error: No se encontraron Datos del Personal");
-        cargaNombres(reg.data[0].nombres);
-        console.log("cargarDescripcionPersonal",reg.data[0].nombres);
-      } catch (error) {
-        console.log("Error",error);
-      }
-    }
-  };
-  const prepararDataDetVentas = async() => {
-    let totales = {
-      valorVentaTotal: 0,
-      descuentoTotal: 0,
-      porcentajeDescuentoTotal: 0,
-      valorVentaNetoTotal: 0,
-      igvTotal: 0,
-      precioVentaTotal: 0
-    }
-    if (dataTemporalVentas.moneda){
-      totales.valorVentaTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.vvUnitME*+curr.cantidad), 0);
-      totales.descuentoTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.descUnitME*+curr.cantidad), 0);
-      totales.valorVentaNetoTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.vvNetoTotME), 0);
-      totales.igvTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.igvTotalME), 0);
-      totales.precioVentaTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.pvTotalME), 0);
-      totales.porcentajeDescuentoTotal = (totales.descuentoTotal / totales.valorVentaTotal) * 100;
-    } else {
-      totales.valorVentaTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.vvUnitMN*+curr.cantidad), 0);
-      totales.descuentoTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.descUnitMN*+curr.cantidad), 0);
-      totales.valorVentaNetoTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.vvNetoTotMN), 0);
-      totales.igvTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.igvTotalMN), 0);
-      totales.precioVentaTotal = detalleVentas.reduce((prev, curr) => prev + (+curr.pvTotalMN), 0);
-      totales.porcentajeDescuentoTotal = (totales.descuentoTotal / totales.valorVentaTotal) * 100;
-    }
-    let dataPreparada = detalleVentas.map((detVenta) => {
-      let totalesFormateado = {
-        valorVentaTotal: 0,
-        descuentoTotal: 0,
-        porcentajeDescuentoTotal: 0,
-        valorVentaNetoTotal: 0,
-        igvTotal: 0,
-        precioVentaTotal: 0
-      }
-      if (dataTemporalVentas.moneda){
-        totalesFormateado.valorVentaTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.vvUnitME*+detVenta.cantidad)); 
-        totalesFormateado.descuentoTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.descUnitME*+detVenta.cantidad));
-        totalesFormateado.valorVentaNetoTotal = new Intl.NumberFormat('es-PE',{ minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.vvNetoTotME));
-        totalesFormateado.igvTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.igvTotalME));
-        // totalesFormateado.precioVentaTotal = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format((+detVenta.pvTotalME));
-        totalesFormateado.precioVentaTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.pvTotalME));
-        totalesFormateado.porcentajeDescuentoTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(((+detVenta.descUnitME*+detVenta.cantidad) / (+detVenta.vvUnitME*+detVenta.cantidad)) * 100);
-      } else {
-        totalesFormateado.valorVentaTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.vvUnitMN*+detVenta.cantidad)); 
-        totalesFormateado.descuentoTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.descUnitMN*+detVenta.cantidad));
-        totalesFormateado.valorVentaNetoTotal = new Intl.NumberFormat('es-PE',{ minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.vvNetoTotMN));
-        totalesFormateado.igvTotal = new Intl.NumberFormat('es-PE',{ minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.igvTotalMN));
-        totalesFormateado.precioVentaTotal = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.pvTotalMN));
-        totalesFormateado.porcentajeDescuentoTotal = new Intl.NumberFormat('es-PE',{ minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(((+detVenta.descUnitMN*+detVenta.cantidad) / (+detVenta.vvUnitMN*+detVenta.cantidad)) * 100);
-      }
-        return {
-            producto: detVenta.Producto.descripcion,
-            cantidad: new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((+detVenta.cantidad)),
-            descuento: totalesFormateado.descuentoTotal,
-            pvtotal: totalesFormateado.precioVentaTotal,
-            vventa: totalesFormateado.valorVentaTotal,
-            descPorc: totalesFormateado.porcentajeDescuentoTotal,
-            vventaneto: totalesFormateado.valorVentaNetoTotal,
-            igv: totalesFormateado.igvTotal,
-            id: +detVenta.id,
-            };
-        });
-    let columns =[{
-                    field: 'producto',
-                    headerName: 'Producto',
-                    width: 300,
-                    editable: false,
-                    valueFormatter: (params) => `${params.value}`,
-                    align: 'left',
-                    headerAlign: 'center',
-                  },
-                  {
-                    field: 'cantidad',
-                    headerName: 'Cant.',
-                    width: 100,
-                    editable: false,
-                    valueFormatter: (params) => `${params.value}`,
-                    align: 'right',
-                    headerAlign: 'center',
-                  },
-                  {
-                    field: 'descuento',
-                    headerName: 'Desc.',
-                    width: 100,
-                    editable: false,
-                    valueFormatter: (params) => `${params.value}`,
-                    align: 'right',
-                    headerAlign: 'center',
-                  },
-                  {
-                    field: 'pvtotal',
-                    headerName: 'PV',
-                    width: 110,
-                    editable: false,
-                    valueFormatter: (params) => `${params.value}`,
-                    align: 'right',
-                    headerAlign: 'center',
-                  },
-                  {
-                    field: 'actions',
-                    headerName: '',
-                    width: 80,
-                    renderCell: (params) => (
-                        <>
-                            <IconButton onClick={() => handleEditDetVentas(params.row)}>
-                                <Edit />
-                            </IconButton>
-                            <IconButton onClick={() => handleDeleteDetVentas(params.row)}>
-                                <Delete />
-                            </IconButton>
-                        </>
-                    ),
-                  },
-                  {
-                    field: 'vventa',
-                    headerName: 'VVenta',
-                    width: 120,
-                    editable: false,
-                    valueFormatter: (params) => `${params.value}`,
-                    align: 'right',
-                    headerAlign: 'center',
-                  },
-                  {
-                    field: 'descPorc',
-                    headerName: '%Desc.',
-                    width: 120,
-                    editable: false,
-                    valueFormatter: (params) => `${params.value}`,
-                    align: 'right',
-                    headerAlign: 'center',
-                  },
-                  {
-                    field: 'vventaneto',
-                    headerName: 'VNeto',
-                    width: 120,
-                    editable: false,
-                    valueFormatter: (params) => `${params.value}`,
-                    align: 'right',
-                    headerAlign: 'center',
-                  },
-                  {
-                    field: 'igv',
-                    headerName: 'IGV',
-                    width: 100,
-                    editable: false,
-                    valueFormatter: (params) => `${params.value}`,
-                    align: 'right',
-                    headerAlign: 'center',
-                  },
-                  {
-                    field: 'id',
-                    headerName: 'ID',
-                    width: 120,
-                    editable: false,
-                    valueFormatter: (params) => `${params.value}`,
-                    align: 'right',
-                    headerAlign: 'center',
-                  }
-  ];
-    setDetTableData(dataPreparada);
-    setDetTableColumns(columns);
-    setTotalesCabVentas(totales);
-};
+
+  
 const handleEditDetVentas =  (row) => {
   openEditModalDetVentas(); // Llama a la función openEditModalDetVentas para abrir el modal de edición
   setFichaDataDetVentas(dataTemporalVentas.DetVentas.find(objeto => +objeto.id === +row.id));
@@ -260,54 +91,10 @@ const closeEditModalDetVentas = async () => {
 const handleSelectionChangeDetVentas = (newSelection) => {
   setSelectedRowsDet(newSelection);
 };
-  const grabarCabVentas = async () => {
-    console.log("grabarCabVentas: dataTemporalVentas",dataTemporalVentas);
-    setFichaDataVentas(dataTemporalVentas);
-    const datosCodificados = {
-      id: +dataTemporalVentas.id,
-      fecha: formatDateStringToyyyymmdd(dataTemporalVentas.fecha),
-      serieDcmto: dataTemporalVentas.serieDcmto,
-      correlativoDcmto: dataTemporalVentas.correlativoDcmto,
-      idContacto: +dataTemporalVentas.idContacto,
-      idDirOrigen: +dataTemporalVentas.idDirOrigen,
-      idDirEntrega: +dataTemporalVentas.idDirEntrega,
-      observaciones: dataTemporalVentas.observaciones,
-      idDocAlmacen: +dataTemporalVentas.idDocAlmacen,
-      idVendedor: +dataTemporalVentas.idVendedor,
-      idTecnico: +dataTemporalVentas.idTecnico,
-      numPlacas: dataTemporalVentas.numPlacas,
-      tipoCambio: +dataTemporalVentas.tipoCambio,
-      porcentajeIGV: +dataTemporalVentas.porcentajeIGV,
-      emailDestino: dataTemporalVentas.emailDestino,
-      rutaDcmtoPDF: dataTemporalVentas.rutaDcmtoPDF,
-      exonerado: dataTemporalVentas.exonerado,
-      moneda: dataTemporalVentas.moneda,
-      factElectOK: dataTemporalVentas.factElectOK,
-      anticipo: dataTemporalVentas.anticipo,
-      created: dataTemporalVentas.created,
-      borradoLogico: dataTemporalVentas.borradoLogico,
-      idHistorico: +dataTemporalVentas.idHistorico,
-      ClienteProveedorId: +dataTemporalVentas.ClienteProveedorId,
-      FormaPagoId: +dataTemporalVentas.FormaPagoId,
-      EstadoDocId: +dataTemporalVentas.EstadoDocId,
-      UsuarioId: +dataTemporalVentas.UsuarioId,
-      TipoCambioId: +dataTemporalVentas.TipoCambioId,
-      CentroCostoId: +dataTemporalVentas.CentroCostoId,
-      CorrelativoDocId: +dataTemporalVentas.CorrelativoDocId
-    };
-    console.log("datosCodificados",datosCodificados);
-    try {
-      let regCabVentasUpdated = await axios.put("http://localhost:3001/cabVentas/update/"+datosCodificados.id, datosCodificados);
-      console.log("regCabVentasUpdated",regCabVentasUpdated);
-      if (!regCabVentasUpdated.data) console.log("Error: No se pudo Actualizar la Informacion de la Cabecera de Ventas");
-    } catch (error) {
-      console.log("Error: En la solicitud Backend, Servidor de Base de Datos NO Responde",error);
-    }
-    console.log("grabarCabVentas: datosCodificados",datosCodificados);
-  }
+  
   const handleSubmitCabVentas = async () => {
     // Aquí puedes manejar la lógica de guardar los cambios y cerrar el modal
-    await grabarCabVentas();
+    await grabarCabVentas(dataTemporalVentas, setFichaDataVentas,formatDateStringToyyyymmdd, detalleVentas, setDetalleVentas);
     setSelectedRows([]); // Deseleccionar el registro en el DataGrid
     setTotalesCabVentas([]);
     onClose();
@@ -319,45 +106,28 @@ const handleSelectionChangeDetVentas = (newSelection) => {
     onClose();
   };
 //console.log("dataTemporalVentas:", dataTemporalVentas, dataTemporalVentas.fecha,typeof dataTemporalVentas.fecha);
-const handleChangeCabVentas = (event) => {
-  setFichaDataVentas({
-      ...dataTemporalVentas,
-      [event.target.name]: event.target.value,
+const handleChangeCabVentas = async (event) => {
+  console.log("handleChangeCabVentas>>>>>>>>","name:",event.target.name,"value:",event.target.value);
+
+  await setDataTemporalVentas({
+    ...dataTemporalVentas,
+    [event.target.name]: event.target.value,
   });
+
+  const newDataTemporalVentas = {
+    ...dataTemporalVentas,
+    [event.target.name]: event.target.value,
+  };
+
+  console.log("newDataTemporalVentas.moneda", newDataTemporalVentas.moneda);
+
+  await prepararDataDetVentas(newDataTemporalVentas, detalleVentas, handleEditDetVentas, handleDeleteDetVentas, setDetTableData, setDetTableColumns, setTotalesCabVentas);
 };
-const obtenerTCsegunFecha = async (fecha) =>{
-  console.log("obtenerTCsegunFecha",fecha);
-  try {
-    let reg = await axios.post('http://localhost:3001/tiposCambio/search', { fecha });
-    console.log("obtenerTCsegunFecha reg:",reg);
-    if (reg.data.length ===0){
-      let reg = await axios.get('http://localhost:3001/tiposCambio/last');
-      console.log("Ultimo reg.data>>>:", reg.data, { fecha: fecha,
-        compra: +reg.data.compra,
-        venta: +reg.data.venta,
-        idHistorico:0
-      });
-      if (!reg) throw new Error("Error: No se encontraron Datos en Tipo de Cambio");
-      let regNew = await axios.post('http://localhost:3001/tiposCambio', 
-                  { fecha: fecha,
-                    compra: +reg.data.compra,
-                    venta: +reg.data.venta,
-                    idHistorico:0
-                  });
-      console.log("regNew:",regNew.data);
-      return regNew.data;
-    }else{
-      return reg.data[0];
-    }
-  } catch (error) {
-    console.log("Error",error);
-  }
-};
+
+
 const handleChangefecha = async (fechaNueva) => {
   let fechaConsulta = moment(fechaNueva.$d).format('YYYY-MM-DD') ;
-  console.log("handleChangefecha","fechaNueva:",fechaNueva, "fechaConsulta",fechaConsulta);
   let regFecha= await obtenerTCsegunFecha(fechaConsulta);
-  console.log("regFecha*********:",regFecha, regFecha.fecha, formatDateStringToddmmyyyy(regFecha.fecha));
   setDataTemporalVentas({
     ...dataTemporalVentas,
     fecha: formatDateStringToddmmyyyy(regFecha.fecha),
@@ -366,19 +136,96 @@ const handleChangefecha = async (fechaNueva) => {
     TipoCambio: regFecha
   });
 };
-const handleChangeBoolean = (event) => {
- // console.log("handleChangeBoolean",event.target)
- setDataTemporalVentas({
-    ...dataTemporalVentas,
-    moneda: event.target.value,
-  });
-}
-const handleChangeDesc = (event, name)=>{
- // console.log("handleChangeDesc",event.floatValue,name)
- setDataTemporalVentas({
-    ...dataTemporalVentas,
-    [name]: event.floatValue
-  });
+
+const handleChangeDesc = (value, formaAplicarDescuento)=>{
+  if (value){
+    let precioVentaTotal = totalesCabVentas.precioVentaTotal;
+    let valorVentaTotal = totalesCabVentas.valorVentaTotal;
+    console.log("handleChangeDesc>>>>>>>>",value,formaAplicarDescuento,precioVentaTotal,valorVentaTotal);
+    let valorIngresado = value;
+    if (formaAplicarDescuento) valorIngresado =  precioVentaTotal*(value/100)
+    let descAplicarAntesIGV = +valorIngresado;
+    console.log("detalleVentas",detalleVentas);
+    let factorProrrateo = descAplicarAntesIGV/precioVentaTotal;
+    let detalleventasDescAplicado = detalleVentas.map(detVenta => {
+        let porcentajeDescUnit = (+factorProrrateo)*100
+        let vvUnitME=0;
+        let descUnitME=0;
+        let vvNetoUnitME=0;
+        let igvUnitME=0;
+        let pvUnitME=0;
+        let vvNetoTotME=0;
+        let igvTotalME=0;
+        let pvTotalME=0;
+        let vvUnitMN=0;
+        let descUnitMN=0;
+        let vvNetoUnitMN=0;
+        let igvUnitMN=0;
+        let pvUnitMN=0;
+        let vvNetoTotMN=0;
+        let igvTotalMN=0;
+        let pvTotalMN=0;
+        if (dataTemporalVentas.moneda){
+          vvUnitME=(+detVenta.vvUnitME);
+          descUnitME=((+detVenta.vvUnitME)*(+factorProrrateo));
+          vvNetoUnitME = (+detVenta.vvUnitME)-(+descUnitME);
+          igvUnitME = (+vvNetoUnitME)*(+dataTemporalVentas.porcentajeIGV/100);
+          pvUnitME = vvNetoUnitME+igvUnitME
+          vvNetoTotME=(+vvNetoUnitME)*(+detVenta.cantidad);
+          igvTotalME=(+vvNetoTotME)*(+dataTemporalVentas.porcentajeIGV/100);
+          pvTotalME=(+vvNetoTotME)+(+igvTotalME);
+
+          vvUnitMN=(+vvUnitME)*(+dataTemporalVentas.tipoCambio);
+          descUnitMN=(+descUnitME)*(+dataTemporalVentas.tipoCambio);
+          vvNetoUnitMN = (+detVenta.vvUnitMN)-(+descUnitMN);
+          igvUnitMN = (+vvNetoUnitMN)*(+dataTemporalVentas.porcentajeIGV/100);
+          pvUnitMN = vvNetoUnitMN+igvUnitMN
+          vvNetoTotMN=(+vvNetoUnitMN)*(+detVenta.cantidad);
+          igvTotalMN=(+vvNetoTotMN)*(+dataTemporalVentas.porcentajeIGV/100);
+          pvTotalMN=(+vvNetoTotMN)+(+igvTotalMN);
+        }else{
+          vvUnitMN=(+detVenta.vvUnitMN);
+          descUnitMN=((+detVenta.vvUnitMN)*(+factorProrrateo));
+          vvNetoUnitMN = (+detVenta.vvUnitMN)-(+descUnitMN);
+          igvUnitMN = (+vvNetoUnitMN)*(+dataTemporalVentas.porcentajeIGV/100);
+          pvUnitMN = vvNetoUnitMN+igvUnitMN
+          vvNetoTotMN=(+vvNetoUnitMN)*(+detVenta.cantidad);
+          igvTotalMN=(+vvNetoTotMN)*(+dataTemporalVentas.porcentajeIGV/100);
+          pvTotalMN=(+vvNetoTotMN)+(+igvTotalMN);
+
+          vvUnitME=(+vvUnitMN)/(+dataTemporalVentas.tipoCambio);
+          descUnitME=(+descUnitMN)/(+dataTemporalVentas.tipoCambio);
+          vvNetoUnitME = (+detVenta.vvUnitME)-(+descUnitME);
+          igvUnitME = (+vvNetoUnitME)*(+dataTemporalVentas.porcentajeIGV/100);
+          pvUnitME = vvNetoUnitME+igvUnitME
+          vvNetoTotME=(+vvNetoUnitME)*(+detVenta.cantidad);
+          igvTotalME=(+vvNetoTotME)*(+dataTemporalVentas.porcentajeIGV/100);
+          pvTotalME=(+vvNetoTotME)+(+igvTotalME);
+        }
+        return {
+          ...detVenta,
+          vvUnitME:vvUnitME,
+          porcentajeDescUnit: porcentajeDescUnit,
+          descUnitME: descUnitME,
+          vvNetoUnitME: vvNetoUnitME,
+          igvUnitME: igvUnitME,
+          pvUnitME: pvUnitME,
+          vvNetoTotME: vvNetoTotME,
+          igvTotalME: igvTotalME,
+          pvTotalME: pvTotalME,
+          vvUnitMN:vvUnitMN,
+          descUnitMN: descUnitMN,
+          vvNetoUnitMN: vvNetoUnitMN,
+          igvUnitMN: igvUnitMN,
+          pvUnitMN: pvUnitMN,
+          vvNetoTotMN: vvNetoTotMN,
+          igvTotalMN: igvTotalMN,
+          pvTotalMN: pvTotalMN
+        }
+    })
+    console.log("detalleventasDescAplicado",detalleventasDescAplicado);
+    setDetalleVentas(detalleventasDescAplicado);
+  }
 };
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -395,14 +242,37 @@ console.log("dataTemporalVentas",dataTemporalVentas);
       <DialogTitle>{dataTemporalVentas.CorrelativoDoc.TipoDocumento.descripcion} ID:{dataTemporalVentas.id}</DialogTitle>
       <DialogContent>
         <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:0.5,mb:0.5}}>
-            <Grid2 xs={4}>
-              <TextField fullWidth className="campoInput" margin='none' label="Serie Dcmto" variant="outlined" size="small" disabled={true} value={dataTemporalVentas.serieDcmto} onChange={handleChangeCabVentas} />
+            <Grid2 xs={3}>
+              <TextField fullWidth className="campoInput" margin='none' label="Serie Dcmto" variant="outlined" size="small" disabled={true} value={dataTemporalVentas.serieDcmto}/>
             </Grid2>
-            <Grid2 xs={4}>
-              <TextField fullWidth className="campoInput" margin='none' label="N° Correlativo" variant="outlined" size="small" disabled={true} value={dataTemporalVentas.correlativoDcmto} onChange={handleChangeCabVentas} />
+            <Grid2 xs={3}>
+              <TextField fullWidth className="campoInput" margin='none' label="N° Correlativo" variant="outlined" size="small" disabled={true} value={dataTemporalVentas.correlativoDcmto} />
             </Grid2>
-            <Grid2 xs={4}>
+            <Grid2 xs={3}>
               <DatePicker className="campoInput" label="Fecha" format="DD/MM/YYYY" formatDensity='dense' size="small" value={dayjs(formatDateStringToyyyymmdd(dataTemporalVentas.fecha))} onAccept={(newValue) => handleChangefecha(newValue)} />
+            </Grid2>
+            <Grid2 xs={3}>
+              <FormControl fullWidth>
+                <InputLabel id="aplicarDescuento">Aplicar Descuento</InputLabel>
+                <Select labelId="labelIdFormaAplicarDescuento" name="formaAplicarDescuento" id="idFormaAplicarDescuento" value={formaAplicarDescuento} label="labelFormaAplicarDescuento" size="small" onChange={(event)=>setFormaAplicarDescuento(event.target.value)}>
+                  <MenuItem value={true}>Porcentaje</MenuItem>
+                  <MenuItem value={false}>Monto</MenuItem>
+                </Select>
+                <NumericFormat
+                  fullWidth
+                  variant='outlined'
+                  disabled={false}
+                  value={descuentoAplicar}
+                  name='descuentoAplicar'
+                  thousandSeparator=","
+                  decimalSeparator="."
+                  decimalScale={2}
+                  fixedDecimalScale
+                  size="small"
+                  customInput={TextField }
+                  onBlur={(event) => handleChangeDesc(event.target.value, formaAplicarDescuento)}
+                />
+              </FormControl>
             </Grid2>
         </Grid2>
         <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:0.5,mb:0.5}}>
@@ -429,7 +299,7 @@ console.log("dataTemporalVentas",dataTemporalVentas);
             <Grid2 xs={4}>
               <FormControl fullWidth>
                 <InputLabel id="moneda">Moneda</InputLabel>
-                <Select labelId="moneda" name="moneda" id="moneda" value={dataTemporalVentas.moneda} label="Moneda" size="small" onChange={handleChangeBoolean}>
+                <Select labelId="moneda" name="moneda" id="moneda" value={dataTemporalVentas.moneda} label="Moneda" size="small" onChange={handleChangeCabVentas}>
                   <MenuItem value={true}>{datosGlobales.descripCortaME}</MenuItem>
                   <MenuItem value={false}>{datosGlobales.descripCortaMN}</MenuItem>
                 </Select>
@@ -593,8 +463,9 @@ console.log("dataTemporalVentas",dataTemporalVentas);
         )}
         <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:1.5}}>
           <Grid2 xs={4}>
-            {/* <TextField className="campoInput" margin='none' label="V.Venta" variant="outlined" size="small" disabled={true} InputProps={{ startAdornment: <InputAdornment position="start">{dataTemporalVentas.moneda?"US$":"S/."}</InputAdornment> }} value={valorVentaTotal} onChange={handleChangeCabVentas} /> */}
+            {/* <TextField label="V.Venta" variant="outlined" size="small" disabled={true} InputProps={{ startAdornment: <InputAdornment position="start">{dataTemporalVentas.moneda?datosGlobales.descripCortaME:datosGlobales.descripCortaMN}</InputAdornment> }} value={totalesCabVentas.valorVentaTotal}/> */}
             <NumericFormat
+              fullWidth
               margin='none'
               variant='outlined'
               disabled={true}
@@ -614,10 +485,11 @@ console.log("dataTemporalVentas",dataTemporalVentas);
           </Grid2>
           <Grid2 xs={4}>
             <NumericFormat
+              fullWidth
               margin='none'
               variant='outlined'
-              disabled={false}
-              label="Descuento"
+              disabled={true}
+              label="Descuento Total"
               value={totalesCabVentas.descuentoTotal}
               name='descuentoTotal'
               thousandSeparator=","
@@ -629,15 +501,15 @@ console.log("dataTemporalVentas",dataTemporalVentas);
               className="campoInput"
               size="small"
               customInput={TextField }
-              onValueChange={(values) => handleChangeDesc(values, "descuentoTotal")}
             />
           </Grid2>
           <Grid2 xs={4}>
             <NumericFormat
+              fullWidth
               margin='none'
               variant='outlined'
-              disabled={false}
-              label="% Desc."
+              disabled={true}
+              label="% Descuento Total"
               value={totalesCabVentas.porcentajeDescuentoTotal}
               name='porcentajeDescuentoTotal'
               thousandSeparator=","
@@ -649,13 +521,13 @@ console.log("dataTemporalVentas",dataTemporalVentas);
               className="campoInput"
               size="small"
               customInput={TextField }
-              onValueChange={(values) => handleChangeDesc(values, "porcentajeDescuentoTotal")}
             />
           </Grid2>
         </Grid2>
         <Grid2 container xs={12} alignItems="center" justifyContent="center" spacing={0.5} sx={{mt:1}}>
           <Grid2 xs={4}>
             <NumericFormat
+              fullWidth
               margin='none'
               variant='outlined'
               disabled={true}
@@ -675,6 +547,7 @@ console.log("dataTemporalVentas",dataTemporalVentas);
           </Grid2>
           <Grid2 xs={4}>
             <NumericFormat
+              fullWidth
               margin='none'
               variant='outlined'
               disabled={true}
@@ -694,6 +567,7 @@ console.log("dataTemporalVentas",dataTemporalVentas);
           </Grid2>
           <Grid2 xs={4}>
               <NumericFormat
+              fullWidth
               margin='none'
               variant='outlined'
               disabled={true}
