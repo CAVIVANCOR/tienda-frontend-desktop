@@ -3,24 +3,26 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { DataGrid, GridRowModes, GridToolbarContainer } from '@mui/x-data-grid';
-import { Box, Button, IconButton, Stack } from '@mui/material';
+import { Box, Button, IconButton } from '@mui/material';
 import { Edit, Delete, Visibility } from '@mui/icons-material';
-import FichaVentasModal from './FichaVentasModal';
-import { setResults } from '../../../redux/features/task/inicio';
+import FichaVentasModal from '../../layout/ventas/FichaVentasModal';
+import { setResults } from '../../../redux/features/task/ventas';
 import AddIcon from '@mui/icons-material/Add';
 
 function ListaVentasTableGrid() {
-    const results = useSelector((state) => state.inicio.results);
-    const dispatch = useDispatch();
+    var hoy = new Date();   
+    const results = useSelector((state) => state.ventas.results);
     const [tableData, setTableData] = useState([]);
     const [tableColumns, setTableColumns] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [fichaDataVentas, setFichaDataVentas] = useState({});
+    const dispatch = useDispatch();
 
     useEffect(() => {
+        console.log("Entro a UseEffect de ListaVentasTableGrid");
         prepararDataCabVentas();
-    }, [results]);
+    }, [ results]);
     const prepararDataCabVentas = async() => {
         let dataPreparada = results.map((venta) => {
             let total = venta.DetVentas.reduce((prev, curr) => prev + +curr.pvTotalMN, 0);
@@ -123,18 +125,13 @@ function ListaVentasTableGrid() {
     const openEditModal = () => {
         setIsEditModalOpen(true);
     };
-    const closeEditModal = () => {
+    const closeEditModal = (dataTemporalVentas) => {
+        console.log(hoy.getHours() + ':' + hoy.getMinutes() + ':' + hoy.getSeconds(), "Entro closeEditModal>>>>>>>>>* dataTemporalVentas:", dataTemporalVentas);
+        let updatedArray = [...results];
+        let indiceDataVentas = updatedArray.findIndex(obj => +obj.id === +dataTemporalVentas.id);
+        updatedArray[indiceDataVentas] = dataTemporalVentas;
+        dispatch(setResults(updatedArray));
         setIsEditModalOpen(false);
-        console.log("Entro closeEditModal",fichaDataVentas);
-        if (fichaDataVentas){
-            let updatedArray = [...results];
-            console.log("updatedArray antes",updatedArray);
-            let indiceDataVentas=updatedArray.findIndex(obj => +obj.id === +fichaDataVentas.id);
-            updatedArray[indiceDataVentas]=fichaDataVentas;
-            console.log("updatedArray despues",updatedArray);
-            dispatch(setResults(updatedArray));
-            setFichaDataVentas({});
-        }
     };
     const handleSelectionChange = (newSelection) => {
         setSelectedRows(newSelection);
@@ -180,10 +177,10 @@ function ListaVentasTableGrid() {
                 {isEditModalOpen && (
                     <FichaVentasModal 
                         isOpen={isEditModalOpen}
-                        onClose={() => closeEditModal()}
+                        setIsEditModalOpen={setIsEditModalOpen}
+                        onCloseCabVentas={(dataTemporalVentas) => closeEditModal(dataTemporalVentas)}
                         setSelectedRows={setSelectedRows}
                         fichaDataVentas={fichaDataVentas}
-                        setFichaDataVentas={setFichaDataVentas}
                     />
                 )}
             </Box>

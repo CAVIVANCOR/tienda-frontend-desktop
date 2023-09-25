@@ -2,21 +2,22 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
-import axios from "axios";
 import { useSelector } from 'react-redux';
 import { Card, CardContent, CardMedia, Typography } from '@mui/material';
 import VerStockModal from './VerStockModal';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import VerDescuentosModal from './VerDescuentosModal';
 import VerFichaProductoModal from './VerFichaProductoModal';
+import { obtenerStockAlmacenes } from '../ventas/bOperacionesApiData';
 function SearchResult (props) {
+  console.log("Entro a SearchResult props:",props);
   const usuarioLogueado = useSelector((state) => state.login.user);
   const [showFotoModal, setShowFotoModal] = useState(false);
   const [showDescuentosModal, setShowDescuentosModal] = useState(false);
   const [showStockModal, setShowStockModal] = useState(false);
   const [stockAlmacenes, setStockAlmacenes] = useState([]);
   useEffect(() => {
-    obtenerStockAlmacenes({ProductoId: +props.dataCompleta.id, idAlmacen: +usuarioLogueado.AlmacenId});
+    actualizarEstadoStockAlmacenes({ProductoId: +props.dataCompleta.id, idAlmacen: +usuarioLogueado.AlmacenId});
   },[props, usuarioLogueado]);
   const openFotoModal = () => {
     setShowFotoModal(true);
@@ -36,25 +37,15 @@ function SearchResult (props) {
   const closeStockModal = () => {
     setShowStockModal(false);
   };
-  const obtenerStockAlmacenes = async (objConsultaStocks) => {
-      let response = await axios.post("http://localhost:3001/kardexAlmacen/consultaStocks", objConsultaStocks);
-      if (response.data.length > 0) {
-        let arrayStockAlmacenes = response.data;
-        let totalStock = arrayStockAlmacenes.reduce((a, b) => a + b.stock, 0)
-        arrayStockAlmacenes.push({descripcion:"STOCK GLOBAL",almacen:+999,stock: +totalStock})
-        await setStockAlmacenes(arrayStockAlmacenes)
-      } else {
-        let arrayStockAlmacenes = response.data;
-        let totalStock = 0
-        arrayStockAlmacenes.push({descripcion:"STOCK GLOBAL",almacen:+999,stock: +totalStock})
-        await setStockAlmacenes(arrayStockAlmacenes);
-        console.log("Error: No se encontro informacion de Stock");
-      }
-  };
+
+  const actualizarEstadoStockAlmacenes = async (objConsultaStocks) => {
+    let arrayStockAlmacenes = await obtenerStockAlmacenes(objConsultaStocks);
+    setStockAlmacenes(arrayStockAlmacenes);
+  }
   useEffect(() => {
     if (showStockModal) {
       console.log("Entro al clic del div stock",{ProductoId: +props.dataCompleta.id})
-      obtenerStockAlmacenes({ProductoId: +props.dataCompleta.id});
+      actualizarEstadoStockAlmacenes({ProductoId: +props.dataCompleta.id});
       console.log(stockAlmacenes);
     } 
   }, [showStockModal]);

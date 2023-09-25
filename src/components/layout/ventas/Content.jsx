@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
-import ContentControllers from './ContentControllers';
+import ContentControllers from '..//..//layout/ventas/ContentControllers';
 import { useSelector } from 'react-redux';
-import ListaVentasTableGrid from './ListaVentasTableGrid';
+import ListaVentasTableGrid from '../..//layout/ventas/ListaVentasTableGrid';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import { Box } from '@mui/material';
 function Content() {
-  let results = useSelector((state) => state.inicio.results);
+  let results = useSelector((state) => state.ventas.results);
   console.log("Entro a Content de Ventas");
   return (
     <Box position={"sticky"} sx={{ flexGrow: 1 }}>

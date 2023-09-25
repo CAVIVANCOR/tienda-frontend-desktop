@@ -3,8 +3,21 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, CardContent, CardHeader, CardMedia, Card, Grid } from '@mui/material';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
+import { useDispatch, useSelector } from 'react-redux';
+import { setIdAlmacenStockVentas, setRegProdStockVentas, setStockVentas } from '../../../redux/features/task/ventas';
+import { stockDisponibleAlmacenUsuario } from '../ventas/bOperacionesApiData';
 
 function VerStockModal({ isOpen, onClose, props, stockAlmacenes }) {
+  const dispatch = useDispatch();
+  const selectVentas = useSelector((state) => state.ventas.selectVentas);
+  const userLogueado = useSelector((state) => state.login.user);
+  let stockDisponible = stockDisponibleAlmacenUsuario(stockAlmacenes,userLogueado.AlmacenId);
+  const aplicaStockSelectVentas = () => {
+    dispatch(setIdAlmacenStockVentas(userLogueado.AlmacenId));
+    dispatch(setStockVentas(stockDisponible));
+    dispatch(setRegProdStockVentas(props.dataCompleta));
+    onClose();
+  }
   return (
     <Dialog open={isOpen} onClose={onClose}>
       <DialogTitle align="center">STOCKS (ID:{props.dataCompleta.id})</DialogTitle>
@@ -40,6 +53,7 @@ function VerStockModal({ isOpen, onClose, props, stockAlmacenes }) {
         </Card>
       </DialogContent>
       <DialogActions>
+        {(selectVentas && stockDisponible>0) ? <Button variant="contained" color='warning' onClick={aplicaStockSelectVentas}>Aplicar</Button>: null}
         <Button variant="contained" onClick={onClose}>Cerrar</Button>
       </DialogActions>
     </Dialog>

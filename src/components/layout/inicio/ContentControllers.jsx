@@ -6,13 +6,13 @@ import { setInputSearch, setInputCodigoBarras, setResults, inicializarInicio } f
 import { useDispatch, useSelector } from 'react-redux';
 import { Box } from '@mui/material';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
-import { WidthFull } from '@mui/icons-material';
 
 function ContentControllers() {
   const inicioInputSearch = useSelector((state) => state.inicio.inputSearch);
   const inicioInputCodigoBarras = useSelector((state) => state.inicio.inputCodigoBarras);
   const dispatch = useDispatch();
   useEffect(() => {
+    console.log("Entro a ContentControllers de Inicio USEEFFECT inicioInputSearch",inicioInputSearch);
     if (inicioInputSearch!==""){
       buscarProducto({descripcion:inicioInputSearch});
     }else{
@@ -21,6 +21,7 @@ function ContentControllers() {
   }, [inicioInputSearch]);
 
   useEffect(() => {
+    console.log("Entro a ContentControllers de Inicio USEEFFECT inicioInputCodigoBarras",inicioInputCodigoBarras);
     if (inicioInputCodigoBarras!==""){
       buscarProducto({codigoProveedor:inicioInputCodigoBarras});
     }else{
@@ -43,7 +44,7 @@ function ContentControllers() {
   const handleCleanClick = () => {
     dispatch(inicializarInicio());
   };
-console.log("Entro a ContentControllers");
+console.log("Entro a ContentControllers de Inicio");
   return (
     <Box ml={2} mr={2} mt={1} sx={{ flexGrow: 0, mx:1,width:"100%"}} >
       <Grid2 container xs={12} sm={12} md={12} lg={12} xl={12} sx={{ width:"100%" }}>
@@ -58,5 +59,3 @@ console.log("Entro a ContentControllers");
   )
 }
 export default ContentControllers
-
-{/* <Grid2 xs={1} sm={1} md={1} lg={1} xl={1} key={id}> */}

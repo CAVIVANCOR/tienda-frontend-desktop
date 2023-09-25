@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
-import ContentControllers from './ContentControllers';
-import ContentData from './ContentData';
-import ContentTotals from './ContentTotals';
-import { Box, Grid } from "@mui/material";
+import ContentControllers from '../../layout/inicio/ContentControllers';
+import ContentData from '../../layout/inicio/ContentData';
+import ContentTotals from '../../layout/inicio/ContentTotals';
+import { Box } from "@mui/material";
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 function Content() {
   console.log("Entro a Content de Inicio");

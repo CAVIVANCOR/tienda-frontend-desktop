@@ -7,7 +7,7 @@ import axios from 'axios';
 import { ExitToApp, Search } from '@mui/icons-material';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 
-function FichaSearchGeneral({ titulo, isOpen, onClose, fichaDataVentas, setFichaDataVentas, setOpenMessageUser, rutaPost, campoLabel, campoId, campoObjecto }) {
+function FichaSearchGeneral({ titulo, isOpen, onClose,  dataTemporalVentas, setDataTemporalVentas, setOpenMessageUser, rutaPost, campoLabel, campoId, campoObjecto }) {
     const [searchDescripcion, setSearchDescripcion] = useState("");
     const [regEncontrados, setRegEncontrados] = useState([]);
     const [listaEncontrados, setListaEncontrados] = useState([]);
@@ -44,16 +44,16 @@ const handleSeleccionar = async (e) => {
   const labelBuscado = e.target.value;
   const elementoEncontrado = listaEncontrados.find(obj => obj.label === labelBuscado);
   if (elementoEncontrado) {
-    setOpenMessageUser(true);
+    setOpenMessageUser();
     if (campoObjecto){
-      setFichaDataVentas({
-        ...fichaDataVentas,
+      setDataTemporalVentas({
+        ...dataTemporalVentas,
         [campoId]: +elementoEncontrado.id,
         [campoObjecto]:regEncontrados.data.find(obj => obj.id === elementoEncontrado.id)
       });
     } else {
-      setFichaDataVentas({
-        ...fichaDataVentas,
+      setDataTemporalVentas({
+        ...dataTemporalVentas,
         [campoId]: +elementoEncontrado.id
       });
     }

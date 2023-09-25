@@ -7,7 +7,7 @@ import axios from 'axios';
 import { ExitToApp, Search } from '@mui/icons-material';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 
-function FichaSearchCliente({ isOpen, onClose, dataTemporalVentas, setDataTemporalVentas, setOpenMessageUser }) {
+function FichaSearchIdDocAfectoNcNd({ isOpen, onClose, dataTemporalVentas, setDataTemporalVentas, setOpenMessageUser }) {
     const [searchClienteNombres, setSearchClienteNombres] = useState("");
     const [searchClienteRuc, setSearchClienteRuc] = useState("");
     const [regClientesEncontrados, setRegClientesEncontrados] = useState([]);
@@ -25,11 +25,14 @@ const handleChangeCliente = (event) => {
 }
 const handleSearchCliente = async () => {
   let datosCodificados = {};
+  datosCodificados.ClienteProveedorId = dataTemporalVentas.ClienteProveedorId;
+  datosCodificados.fechaFinal = dataTemporalVentas.fecha;
+
   if (searchClienteNombres!=="") datosCodificados.razonSocial = searchClienteNombres;
   if (searchClienteRuc!=="") datosCodificados.numDocIdentidad = searchClienteRuc; 
   if (!datosCodificados) return;
   try {
-    let regEncontrados = await axios.post("http://localhost:3001/clientesProveedores/search", datosCodificados);
+    let regEncontrados = await axios.post("http://localhost:3001/cabVentas/search", datosCodificados);
     if (!regEncontrados) console.log("Error: No se encontro el Cliente o Proveedor");
     setRegClientesEncontrados(regEncontrados);
     let dataFiltradaClientes = regEncontrados.data.map(obj => {
@@ -92,4 +95,4 @@ const handleSeleccionarCliente = async (e) => {
     </Dialog>
   );
 }
-export default FichaSearchCliente;
+export default FichaSearchIdDocAfectoNcNd;
